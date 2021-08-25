@@ -14,6 +14,7 @@ tokens = [
     'MENOS',
     'POR',
     'DIV',
+    'POTE',
     'MODULO',
     'MAYORQUE',
     'MENORQUE',
@@ -39,7 +40,6 @@ tokens = [
     'ID',
     'COMENTARIO_SIMPLE',
     'COMENTARIO_VARIAS_LINEAS',
-    'POT',
 ] + list(reservadas.values())
 
 # tokens
@@ -47,7 +47,7 @@ t_MAS           = r'\+'
 t_MENOS         = r'\-'
 t_POR           = r'\*'
 t_DIV           = r'\/'
-# t_POT           = r'\^'
+t_POTE           = r'\^'
 t_MODULO        = r'\%'
 t_MAYORQUE      = r'\>'
 t_MENORQUE      = r'\<'
@@ -115,7 +115,7 @@ def t_CHAR(t):
 
 # comentario de varias lineas //...
 def t_COMENTARIO_VARIAS_LINEAS(t):
-    r'\#\*(.|\n)*?\*\#'
+    r'\#\=(.|\n)*?\=\#'
     t.lexer.lineno += t.value.count("\n") 
 
 # Comentario simple //...
@@ -145,23 +145,25 @@ def find_column(inp, token):
 import Interprete.ply.lex as lex
 lexer = lex.lex()
 # Asociacion
-# precedence = (
-#     ('left','OR'),
-#     ('left','AND'),
-#     ('right','UNOT'),
-#     ('left','IGUALIGUAL','DIFERENCIA','MENORQUE','MENORIGUAL','MAYORQUE','MAYORIGUAL'),
-#     ('left','MAS','MENOS'),
-#     ('left','DIV','POR','MODULO'),
-#     ('nonassoc', 'POT'),
-#     ('right','UMENOS'),
-#     )
+precedence = (
+    ('left','OR'),
+    ('left','AND'),
+    ('right','UNOT'),
+    ('left','IGUALACION','DIFERENCIA','MENORQUE','MENORIGUAL','MAYORQUE','MAYORIGUAL'),
+    ('left','MAS','MENOS'),
+    ('left','DIV','POR','MODULO'),
+    ('nonassoc', 'POTE'),
+    ('right','UMENOS','UMAS'),
+    )
 
 # Definición de la Gramatica 
 #   Clases Abstractas.
 from Interprete.Instrucciones.Println import Println
 from Interprete.Instrucciones.Print import Print
 
+from Interprete.Expresion.Aritmetica import Aritmetica
 from Interprete.Expresion.Primitivo import Primitivo
+from Interprete.Expresion.Logica import Logica
 from Interprete.TS.Tipo import *
 
 def p_init(t) :
@@ -197,11 +199,12 @@ def p_instruccion(t):
 # ---------------------------------------- ERROR EN PUNTO COMA -------------------------------------------
 def p_instruccion_error(t):
     'instruccion        : error PUNTOCOMA'
-    errores.append(Exception("Sintáctico","Error Sintáctico." + str(t[1].value) , t.lineno(1), find_column(input, t.slice[1])))
+    errores.append(Exception("Sintáctico","Error Sintáctico. " + str(t[1].value) , t.lineno(1), find_column(input, t.slice[1])))
     t[0] = ""
 
 def p_fin_instruccion(t) :
-    '''fin_instruccion  : PUNTOCOMA '''
+    '''fin_instruccion  : PUNTOCOMA 
+                        |   '''
     t[0] = None
 
 # --------------------------------------------- IMPRIMIR ---------------------------------------------
@@ -214,6 +217,42 @@ def p_imprimir_println(t): # Sin salto de linea
     t[0] = Println(t[3], t.lineno(1), find_column(input, t.slice[1]))
 
 # --------------------------------------------- EXPRESION ---------------------------------------------
+
+def p_expresion_binaria(t):
+    '''
+    expresion : expresion MAS expresion
+            | expresion MENOS expresion
+            | expresion POR expresion
+            | expresion DIV expresion
+            | expresion POTE expresion
+            | expresion MODULO expresion
+    '''
+    if t[2] == '+':
+        t[0] = Aritmetica(t[1], Operador_Aritmetico.SUMA,   t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '-':
+        t[0] = Aritmetica(t[1], Operador_Aritmetico.RESTA,  t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '*':
+        t[0] = Aritmetica(t[1], Operador_Aritmetico.POR,    t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '/':
+        t[0] = Aritmetica(t[1], Operador_Aritmetico.DIV,    t[3], t.lineno(2), find_column(input, t.slice[2]))   
+    elif t[2] == '^':
+        print(t[2])
+        t[0] = Aritmetica(t[1], Operador_Aritmetico.POTE,   t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '%':
+        t[0] = Aritmetica(t[1], Operador_Aritmetico.MODU,   t[3], t.lineno(2), find_column(input, t.slice[2]))  
+
+def p_expresion_unaria(t):
+    '''expresion : MENOS expresion %prec UMENOS
+                | NOT expresion %prec UNOT 
+                | MAS expresion %prec UMAS'''
+    
+    if t[1] == '-':
+        t[0] = Aritmetica(t[2], Operador_Aritmetico.UMENOS, None, t.lineno(1), find_column(input, t.slice[1]))
+    elif t[1] == '+':
+        t[0] = Aritmetica(t[2], Operador_Aritmetico.UMAS, None, t.lineno(1), find_column(input, t.slice[1]))
+    elif t[1] == '!':
+         t[0] = Logica(t[2], Operador_Logico.NOT, None, t.lineno(1), find_column(input, t.slice[1]))
+
 def p_expresion_agrupacion(t):
     ''' expresion :   PARA expresion PARC '''
     t[0] = t[2]
@@ -284,7 +323,7 @@ for instruccion in ast.get_instruccion():
     value = instruccion.interpretar(ast, TSGlobal)
     if isinstance(value, Exception):
         ast.get_excepcion().append(value)
-        ast.update_consola(error.__str__())
+        ast.update_consola(value.__str__())
 
 
 print(ast.get_consola())

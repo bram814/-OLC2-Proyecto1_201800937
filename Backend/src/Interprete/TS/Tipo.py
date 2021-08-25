@@ -19,6 +19,8 @@ class Operador_Aritmetico(Enum):
     DIV         = 4  # division (/)
     POTE        = 5  # potencia (^)
     MODU        = 6  # modulo (%)
+    UMENOS      = 7  # unario (-)
+    UMAS        = 8  # unario (+)
 
 class Operador_Relacional(Enum):
     
