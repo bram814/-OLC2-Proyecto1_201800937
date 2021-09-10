@@ -243,6 +243,8 @@ def p_expresion_binaria(t):
             | expresion MENORIGUAL expresion
             | expresion IGUALACION expresion
             | expresion DIFERENCIA expresion
+            | expresion AND expresion
+            | expresion OR expresion
     '''
     # Aritmética
     if t[2] == '+':
@@ -270,6 +272,11 @@ def p_expresion_binaria(t):
         t[0] = Relacional(t[1], Operador_Relacional.IGUALACION, t[3], t.lineno(2), find_column(input, t.slice[2]))
     elif t[2] == '!=':
         t[0] = Relacional(t[1], Operador_Relacional.DIFERENCIA, t[3], t.lineno(2), find_column(input, t.slice[2]))
+    # Lógica.
+    elif t[2] == '&&':
+        t[0] = Logica(t[1], Operador_Logico.AND, t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '||':
+        t[0] = Logica(t[1], Operador_Logico.OR, t[3], t.lineno(2), find_column(input, t.slice[2]))
 
 def p_expresion_unaria(t):
     '''expresion : MENOS expresion %prec UMENOS
