@@ -13,7 +13,7 @@ class Print(Instruccion):
         value = self.expresion.interpretar(tree, table)
 
         if isinstance(value, Exception): return value
-        
+
         tree.update_consola_(value)
 
     def AST(self):

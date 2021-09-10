@@ -1,5 +1,5 @@
 class Simbolo():
-    
+
     def __init__(self, id, tipo, fila, columna, valor):
         self.id = id
         self.tipo = tipo

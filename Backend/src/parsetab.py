@@ -6,9 +6,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'leftORleftANDrightUNOTleftIGUALACIONDIFERENCIAMENORQUEMENORIGUALMAYORQUEMAYORIGUALleftMASMENOSleftDIVPORMODULOnonassocPOTErightUMENOSUMASAND CADENA CHAR COMA COMENTARIO_SIMPLE COMENTARIO_VARIAS_LINEAS DECIMAL DIFERENCIA DIV DOBLEPUNTO ENTERO ID IGUAL IGUALACION LLAVEA LLAVEC MAS MAYORIGUAL MAYORQUE MENORIGUAL MENORQUE MENOS MODULO NOT OR PARA PARC POR POTE PUNTOCOMA RFALSE RPRINT RPRINTLN RTRUEinit            : instruccionesinstrucciones    : instrucciones instruccioninstrucciones    : instruccioninstruccion  : ins_print fin_instruccion\n                    | ins_println fin_instruccion\n                    | COMENTARIO_VARIAS_LINEAS\n                    | COMENTARIO_SIMPLE\n    instruccion        : error PUNTOCOMAfin_instruccion  : PUNTOCOMA \n                        |   ins_print   : RPRINT PARA expresion PARCins_println   : RPRINTLN PARA expresion PARC\n    expresion : expresion MAS expresion\n            | expresion MENOS expresion\n            | expresion POR expresion\n            | expresion DIV expresion\n            | expresion POTE expresion\n            | expresion MODULO expresion\n    expresion : MENOS expresion %prec UMENOS\n                | NOT expresion %prec UNOT \n                | MAS expresion %prec UMAS expresion :   PARA expresion PARC expresion : ENTEROexpresion : DECIMALexpresion : CADENAexpresion : CHARexpresion : RTRUEexpresion : RFALSE'
+_lr_signature = 'rightIGUALleftORleftANDleftUNOTnonassocMAYORQUEMENORQUEMAYORIGUALMENORIGUALIGUALACIONDIFERENCIAleftMASMENOSleftPORDIVMODULOrightUMENOSrightPOTEAND CADENA CHAR COMA COMENTARIO_SIMPLE COMENTARIO_VARIAS_LINEAS DECIMAL DIFERENCIA DIV DOBLEPUNTO ENTERO ID IGUAL IGUALACION LLAVEA LLAVEC MAS MAYORIGUAL MAYORQUE MENORIGUAL MENORQUE MENOS MODULO NOT OR PARA PARC POR POTE PUNTOCOMA RFALSE RPRINT RPRINTLN RTRUEinit            : instruccionesinstrucciones    : instrucciones instruccioninstrucciones    : instruccioninstruccion  : ins_print fin_instruccion\n                    | ins_println fin_instruccion\n                    | COMENTARIO_VARIAS_LINEAS\n                    | COMENTARIO_SIMPLE\n    instruccion        : error PUNTOCOMAfin_instruccion  : PUNTOCOMAins_print   : RPRINT PARA expresion PARCins_println   : RPRINTLN PARA expresion PARC\n    expresion : expresion MAS expresion\n            | expresion MENOS expresion\n            | expresion POR expresion\n            | expresion DIV expresion\n            | expresion POTE expresion\n            | expresion MODULO expresion\n            | expresion MAYORQUE expresion\n            | expresion MENORQUE expresion\n            | expresion MAYORIGUAL expresion\n            | expresion MENORIGUAL expresion\n            | expresion IGUALACION expresion\n            | expresion DIFERENCIA expresion\n    expresion : MENOS expresion %prec UMENOS\n                | NOT expresion %prec UNOT expresion :   PARA expresion PARC expresion : ENTEROexpresion : DECIMALexpresion : CADENAexpresion : CHARexpresion : RTRUEexpresion : RFALSE'
     
-_lr_action_items = {'COMENTARIO_VARIAS_LINEAS':([0,2,3,4,5,6,7,11,12,13,14,15,31,41,],[6,6,-3,-10,-10,-6,-7,-2,-4,-9,-5,-8,-11,-12,]),'COMENTARIO_SIMPLE':([0,2,3,4,5,6,7,11,12,13,14,15,31,41,],[7,7,-3,-10,-10,-6,-7,-2,-4,-9,-5,-8,-11,-12,]),'error':([0,2,3,4,5,6,7,11,12,13,14,15,31,41,],[8,8,-3,-10,-10,-6,-7,-2,-4,-9,-5,-8,-11,-12,]),'RPRINT':([0,2,3,4,5,6,7,11,12,13,14,15,31,41,],[9,9,-3,-10,-10,-6,-7,-2,-4,-9,-5,-8,-11,-12,]),'RPRINTLN':([0,2,3,4,5,6,7,11,12,13,14,15,31,41,],[10,10,-3,-10,-10,-6,-7,-2,-4,-9,-5,-8,-11,-12,]),'$end':([1,2,3,4,5,6,7,11,12,13,14,15,31,41,],[0,-1,-3,-10,-10,-6,-7,-2,-4,-9,-5,-8,-11,-12,]),'PUNTOCOMA':([4,5,8,31,41,],[13,13,15,-11,-12,]),'PARA':([9,10,16,17,18,20,21,22,32,33,34,35,36,37,],[16,17,18,18,18,18,18,18,18,18,18,18,18,18,]),'MENOS':([16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,32,33,34,35,36,37,38,39,40,42,43,44,45,46,47,48,],[21,21,21,33,21,21,21,-23,-24,-25,-26,-27,-28,33,33,21,21,21,21,21,21,-21,-19,33,-22,-13,-14,-15,-16,-17,-18,]),'NOT':([16,17,18,20,21,22,32,33,34,35,36,37,],[22,22,22,22,22,22,22,22,22,22,22,22,]),'MAS':([16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,32,33,34,35,36,37,38,39,40,42,43,44,45,46,47,48,],[20,20,20,32,20,20,20,-23,-24,-25,-26,-27,-28,32,32,20,20,20,20,20,20,-21,-19,32,-22,-13,-14,-15,-16,-17,-18,]),'ENTERO':([16,17,18,20,21,22,32,33,34,35,36,37,],[23,23,23,23,23,23,23,23,23,23,23,23,]),'DECIMAL':([16,17,18,20,21,22,32,33,34,35,36,37,],[24,24,24,24,24,24,24,24,24,24,24,24,]),'CADENA':([16,17,18,20,21,22,32,33,34,35,36,37,],[25,25,25,25,25,25,25,25,25,25,25,25,]),'CHAR':([16,17,18,20,21,22,32,33,34,35,36,37,],[26,26,26,26,26,26,26,26,26,26,26,26,]),'RTRUE':([16,17,18,20,21,22,32,33,34,35,36,37,],[27,27,27,27,27,27,27,27,27,27,27,27,]),'RFALSE':([16,17,18,20,21,22,32,33,34,35,36,37,],[28,28,28,28,28,28,28,28,28,28,28,28,]),'PARC':([19,23,24,25,26,27,28,29,30,38,39,40,42,43,44,45,46,47,48,],[31,-23,-24,-25,-26,-27,-28,41,42,-21,-19,-20,-22,-13,-14,-15,-16,-17,-18,]),'POR':([19,23,24,25,26,27,28,29,30,38,39,40,42,43,44,45,46,47,48,],[34,-23,-24,-25,-26,-27,-28,34,34,-21,-19,34,-22,34,34,-15,-16,-17,-18,]),'DIV':([19,23,24,25,26,27,28,29,30,38,39,40,42,43,44,45,46,47,48,],[35,-23,-24,-25,-26,-27,-28,35,35,-21,-19,35,-22,35,35,-15,-16,-17,-18,]),'POTE':([19,23,24,25,26,27,28,29,30,38,39,40,42,43,44,45,46,47,48,],[36,-23,-24,-25,-26,-27,-28,36,36,-21,-19,36,-22,36,36,36,36,None,36,]),'MODULO':([19,23,24,25,26,27,28,29,30,38,39,40,42,43,44,45,46,47,48,],[37,-23,-24,-25,-26,-27,-28,37,37,-21,-19,37,-22,37,37,-15,-16,-17,-18,]),}
+_lr_action_items = {'COMENTARIO_VARIAS_LINEAS':([0,2,3,6,7,11,12,13,14,15,],[6,6,-3,-6,-7,-2,-4,-9,-5,-8,]),'COMENTARIO_SIMPLE':([0,2,3,6,7,11,12,13,14,15,],[7,7,-3,-6,-7,-2,-4,-9,-5,-8,]),'error':([0,2,3,6,7,11,12,13,14,15,],[8,8,-3,-6,-7,-2,-4,-9,-5,-8,]),'RPRINT':([0,2,3,6,7,11,12,13,14,15,],[9,9,-3,-6,-7,-2,-4,-9,-5,-8,]),'RPRINTLN':([0,2,3,6,7,11,12,13,14,15,],[10,10,-3,-6,-7,-2,-4,-9,-5,-8,]),'$end':([1,2,3,6,7,11,12,13,14,15,],[0,-1,-3,-6,-7,-2,-4,-9,-5,-8,]),'PUNTOCOMA':([4,5,8,30,45,],[13,13,15,-10,-11,]),'PARA':([9,10,16,17,18,20,21,31,32,33,34,35,36,37,38,39,40,41,42,],[16,17,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,18,]),'MENOS':([16,17,18,19,20,21,22,23,24,25,26,27,28,29,31,32,33,34,35,36,37,38,39,40,41,42,43,44,46,47,48,49,50,51,52,53,54,55,56,57,58,],[20,20,20,32,20,20,-27,-28,-29,-30,-31,-32,32,32,20,20,20,20,20,20,20,20,20,20,20,20,-24,32,-26,-12,-13,-14,-15,-16,-17,32,32,32,32,32,32,]),'NOT':([16,17,18,20,21,31,32,33,34,35,36,37,38,39,40,41,42,],[21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,]),'ENTERO':([16,17,18,20,21,31,32,33,34,35,36,37,38,39,40,41,42,],[22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,22,]),'DECIMAL':([16,17,18,20,21,31,32,33,34,35,36,37,38,39,40,41,42,],[23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,23,]),'CADENA':([16,17,18,20,21,31,32,33,34,35,36,37,38,39,40,41,42,],[24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,24,]),'CHAR':([16,17,18,20,21,31,32,33,34,35,36,37,38,39,40,41,42,],[25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,]),'RTRUE':([16,17,18,20,21,31,32,33,34,35,36,37,38,39,40,41,42,],[26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,]),'RFALSE':([16,17,18,20,21,31,32,33,34,35,36,37,38,39,40,41,42,],[27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,]),'PARC':([19,22,23,24,25,26,27,28,29,43,44,46,47,48,49,50,51,52,53,54,55,56,57,58,],[30,-27,-28,-29,-30,-31,-32,45,46,-24,-25,-26,-12,-13,-14,-15,-16,-17,-18,-19,-20,-21,-22,-23,]),'MAS':([19,22,23,24,25,26,27,28,29,43,44,46,47,48,49,50,51,52,53,54,55,56,57,58,],[31,-27,-28,-29,-30,-31,-32,31,31,-24,31,-26,-12,-13,-14,-15,-16,-17,31,31,31,31,31,31,]),'POR':([19,22,23,24,25,26,27,28,29,43,44,46,47,48,49,50,51,52,53,54,55,56,57,58,],[33,-27,-28,-29,-30,-31,-32,33,33,-24,33,-26,33,33,-14,-15,-16,-17,33,33,33,33,33,33,]),'DIV':([19,22,23,24,25,26,27,28,29,43,44,46,47,48,49,50,51,52,53,54,55,56,57,58,],[34,-27,-28,-29,-30,-31,-32,34,34,-24,34,-26,34,34,-14,-15,-16,-17,34,34,34,34,34,34,]),'POTE':([19,22,23,24,25,26,27,28,29,43,44,46,47,48,49,50,51,52,53,54,55,56,57,58,],[35,-27,-28,-29,-30,-31,-32,35,35,35,35,-26,35,35,35,35,35,35,35,35,35,35,35,35,]),'MODULO':([19,22,23,24,25,26,27,28,29,43,44,46,47,48,49,50,51,52,53,54,55,56,57,58,],[36,-27,-28,-29,-30,-31,-32,36,36,-24,36,-26,36,36,-14,-15,-16,-17,36,36,36,36,36,36,]),'MAYORQUE':([19,22,23,24,25,26,27,28,29,43,44,46,47,48,49,50,51,52,53,54,55,56,57,58,],[37,-27,-28,-29,-30,-31,-32,37,37,-24,37,-26,-12,-13,-14,-15,-16,-17,None,None,None,None,None,None,]),'MENORQUE':([19,22,23,24,25,26,27,28,29,43,44,46,47,48,49,50,51,52,53,54,55,56,57,58,],[38,-27,-28,-29,-30,-31,-32,38,38,-24,38,-26,-12,-13,-14,-15,-16,-17,None,None,None,None,None,None,]),'MAYORIGUAL':([19,22,23,24,25,26,27,28,29,43,44,46,47,48,49,50,51,52,53,54,55,56,57,58,],[39,-27,-28,-29,-30,-31,-32,39,39,-24,39,-26,-12,-13,-14,-15,-16,-17,None,None,None,None,None,None,]),'MENORIGUAL':([19,22,23,24,25,26,27,28,29,43,44,46,47,48,49,50,51,52,53,54,55,56,57,58,],[40,-27,-28,-29,-30,-31,-32,40,40,-24,40,-26,-12,-13,-14,-15,-16,-17,None,None,None,None,None,None,]),'IGUALACION':([19,22,23,24,25,26,27,28,29,43,44,46,47,48,49,50,51,52,53,54,55,56,57,58,],[41,-27,-28,-29,-30,-31,-32,41,41,-24,41,-26,-12,-13,-14,-15,-16,-17,None,None,None,None,None,None,]),'DIFERENCIA':([19,22,23,24,25,26,27,28,29,43,44,46,47,48,49,50,51,52,53,54,55,56,57,58,],[42,-27,-28,-29,-30,-31,-32,42,42,-24,42,-26,-12,-13,-14,-15,-16,-17,None,None,None,None,None,None,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -17,7 +17,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'init':([0,],[1,]),'instrucciones':([0,],[2,]),'instruccion':([0,2,],[3,11,]),'ins_print':([0,2,],[4,4,]),'ins_println':([0,2,],[5,5,]),'fin_instruccion':([4,5,],[12,14,]),'expresion':([16,17,18,20,21,22,32,33,34,35,36,37,],[19,29,30,38,39,40,43,44,45,46,47,48,]),}
+_lr_goto_items = {'init':([0,],[1,]),'instrucciones':([0,],[2,]),'instruccion':([0,2,],[3,11,]),'ins_print':([0,2,],[4,4,]),'ins_println':([0,2,],[5,5,]),'fin_instruccion':([4,5,],[12,14,]),'expresion':([16,17,18,20,21,31,32,33,34,35,36,37,38,39,40,41,42,],[19,28,29,43,44,47,48,49,50,51,52,53,54,55,56,57,58,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -27,32 +27,36 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> init","S'",1,None,None,None),
-  ('init -> instrucciones','init',1,'p_init','Gramatica.py',170),
-  ('instrucciones -> instrucciones instruccion','instrucciones',2,'p_instrucciones_instrucciones_instruccion','Gramatica.py',174),
-  ('instrucciones -> instruccion','instrucciones',1,'p_instrucciones_instruccion','Gramatica.py',182),
-  ('instruccion -> ins_print fin_instruccion','instruccion',2,'p_instruccion','Gramatica.py',191),
-  ('instruccion -> ins_println fin_instruccion','instruccion',2,'p_instruccion','Gramatica.py',192),
-  ('instruccion -> COMENTARIO_VARIAS_LINEAS','instruccion',1,'p_instruccion','Gramatica.py',193),
-  ('instruccion -> COMENTARIO_SIMPLE','instruccion',1,'p_instruccion','Gramatica.py',194),
-  ('instruccion -> error PUNTOCOMA','instruccion',2,'p_instruccion_error','Gramatica.py',201),
-  ('fin_instruccion -> PUNTOCOMA','fin_instruccion',1,'p_fin_instruccion','Gramatica.py',206),
-  ('fin_instruccion -> <empty>','fin_instruccion',0,'p_fin_instruccion','Gramatica.py',207),
-  ('ins_print -> RPRINT PARA expresion PARC','ins_print',4,'p_imprimir_print','Gramatica.py',212),
-  ('ins_println -> RPRINTLN PARA expresion PARC','ins_println',4,'p_imprimir_println','Gramatica.py',216),
-  ('expresion -> expresion MAS expresion','expresion',3,'p_expresion_binaria','Gramatica.py',223),
-  ('expresion -> expresion MENOS expresion','expresion',3,'p_expresion_binaria','Gramatica.py',224),
-  ('expresion -> expresion POR expresion','expresion',3,'p_expresion_binaria','Gramatica.py',225),
-  ('expresion -> expresion DIV expresion','expresion',3,'p_expresion_binaria','Gramatica.py',226),
-  ('expresion -> expresion POTE expresion','expresion',3,'p_expresion_binaria','Gramatica.py',227),
-  ('expresion -> expresion MODULO expresion','expresion',3,'p_expresion_binaria','Gramatica.py',228),
-  ('expresion -> MENOS expresion','expresion',2,'p_expresion_unaria','Gramatica.py',245),
-  ('expresion -> NOT expresion','expresion',2,'p_expresion_unaria','Gramatica.py',246),
-  ('expresion -> MAS expresion','expresion',2,'p_expresion_unaria','Gramatica.py',247),
-  ('expresion -> PARA expresion PARC','expresion',3,'p_expresion_agrupacion','Gramatica.py',257),
-  ('expresion -> ENTERO','expresion',1,'p_expresion_entero','Gramatica.py',261),
-  ('expresion -> DECIMAL','expresion',1,'p_primitivo_decimal','Gramatica.py',265),
-  ('expresion -> CADENA','expresion',1,'p_primitivo_cadena','Gramatica.py',269),
-  ('expresion -> CHAR','expresion',1,'p_primitivo_char','Gramatica.py',273),
-  ('expresion -> RTRUE','expresion',1,'p_primitivo_true','Gramatica.py',277),
-  ('expresion -> RFALSE','expresion',1,'p_primitivo_false','Gramatica.py',281),
+  ('init -> instrucciones','init',1,'p_init','Gramatica.py',182),
+  ('instrucciones -> instrucciones instruccion','instrucciones',2,'p_instrucciones_instrucciones_instruccion','Gramatica.py',186),
+  ('instrucciones -> instruccion','instrucciones',1,'p_instrucciones_instruccion','Gramatica.py',194),
+  ('instruccion -> ins_print fin_instruccion','instruccion',2,'p_instruccion','Gramatica.py',203),
+  ('instruccion -> ins_println fin_instruccion','instruccion',2,'p_instruccion','Gramatica.py',204),
+  ('instruccion -> COMENTARIO_VARIAS_LINEAS','instruccion',1,'p_instruccion','Gramatica.py',205),
+  ('instruccion -> COMENTARIO_SIMPLE','instruccion',1,'p_instruccion','Gramatica.py',206),
+  ('instruccion -> error PUNTOCOMA','instruccion',2,'p_instruccion_error','Gramatica.py',213),
+  ('fin_instruccion -> PUNTOCOMA','fin_instruccion',1,'p_fin_instruccion','Gramatica.py',218),
+  ('ins_print -> RPRINT PARA expresion PARC','ins_print',4,'p_imprimir_print','Gramatica.py',223),
+  ('ins_println -> RPRINTLN PARA expresion PARC','ins_println',4,'p_imprimir_println','Gramatica.py',227),
+  ('expresion -> expresion MAS expresion','expresion',3,'p_expresion_binaria','Gramatica.py',234),
+  ('expresion -> expresion MENOS expresion','expresion',3,'p_expresion_binaria','Gramatica.py',235),
+  ('expresion -> expresion POR expresion','expresion',3,'p_expresion_binaria','Gramatica.py',236),
+  ('expresion -> expresion DIV expresion','expresion',3,'p_expresion_binaria','Gramatica.py',237),
+  ('expresion -> expresion POTE expresion','expresion',3,'p_expresion_binaria','Gramatica.py',238),
+  ('expresion -> expresion MODULO expresion','expresion',3,'p_expresion_binaria','Gramatica.py',239),
+  ('expresion -> expresion MAYORQUE expresion','expresion',3,'p_expresion_binaria','Gramatica.py',240),
+  ('expresion -> expresion MENORQUE expresion','expresion',3,'p_expresion_binaria','Gramatica.py',241),
+  ('expresion -> expresion MAYORIGUAL expresion','expresion',3,'p_expresion_binaria','Gramatica.py',242),
+  ('expresion -> expresion MENORIGUAL expresion','expresion',3,'p_expresion_binaria','Gramatica.py',243),
+  ('expresion -> expresion IGUALACION expresion','expresion',3,'p_expresion_binaria','Gramatica.py',244),
+  ('expresion -> expresion DIFERENCIA expresion','expresion',3,'p_expresion_binaria','Gramatica.py',245),
+  ('expresion -> MENOS expresion','expresion',2,'p_expresion_unaria','Gramatica.py',275),
+  ('expresion -> NOT expresion','expresion',2,'p_expresion_unaria','Gramatica.py',276),
+  ('expresion -> PARA expresion PARC','expresion',3,'p_expresion_agrupacion','Gramatica.py',286),
+  ('expresion -> ENTERO','expresion',1,'p_expresion_entero','Gramatica.py',290),
+  ('expresion -> DECIMAL','expresion',1,'p_primitivo_decimal','Gramatica.py',294),
+  ('expresion -> CADENA','expresion',1,'p_primitivo_cadena','Gramatica.py',298),
+  ('expresion -> CHAR','expresion',1,'p_primitivo_char','Gramatica.py',302),
+  ('expresion -> RTRUE','expresion',1,'p_primitivo_true','Gramatica.py',306),
+  ('expresion -> RFALSE','expresion',1,'p_primitivo_false','Gramatica.py',310),
 ]

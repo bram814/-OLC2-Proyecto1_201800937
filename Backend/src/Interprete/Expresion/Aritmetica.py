@@ -148,15 +148,15 @@ class Aritmetica(Instruccion):
                 return - self.casteo(self.exp_left.tipo, left)
             return Exception("Semantico", "Tipo Erroneo de operacion para - unario.", self.fila, self.columna)
 
-        elif self.operador == Operador_Aritmetico.UMAS:
-            if self.exp_left.tipo == Tipo.INT64:
-                self.tipo = Tipo.INT64
-                return self.casteo(self.exp_left.tipo, left)
-            elif self.exp_left.tipo == Tipo.FLOAT64:
-                self.tipo = Tipo.FLOAT64
-                return self.casteo(self.exp_left.tipo, left)
-            return Exception("Semantico", "Tipo Erroneo de operacion para + unario.", self.fila, self.columna)
-
+        # elif self.operador == Operador_Aritmetico.UMAS:
+        #     if self.exp_left.tipo == Tipo.INT64:
+        #         self.tipo = Tipo.INT64
+        #         return self.casteo(self.exp_left.tipo, left)
+        #     elif self.exp_left.tipo == Tipo.FLOAT64:
+        #         self.tipo = Tipo.FLOAT64
+        #         return self.casteo(self.exp_left.tipo, left)
+        #     return Exception("Semantico", "Tipo Erroneo de operacion para + unario.", self.fila, self.columna)
+        
         return Exception("Semantico", "Tipo de Operacion Aritmética no Especificado.", self.fila, self.columna)    
 
     def AST(self):

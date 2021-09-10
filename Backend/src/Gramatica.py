@@ -145,15 +145,26 @@ def find_column(inp, token):
 import Interprete.ply.lex as lex
 lexer = lex.lex()
 # Asociacion
+# precedence = (
+#     ('left','OR'),
+#     ('left','AND'),
+#     ('right','UNOT'),
+#     ('left','IGUALACION','DIFERENCIA','MENORQUE','MENORIGUAL','MAYORQUE','MAYORIGUAL'),
+#     ('left','MAS','MENOS'),
+#     ('left','DIV','POR','MODULO'),
+#     ('nonassoc', 'POTE'),
+#     ('right','UMENOS'),
+#     )
 precedence = (
-    ('left','OR'),
-    ('left','AND'),
-    ('right','UNOT'),
-    ('left','IGUALACION','DIFERENCIA','MENORQUE','MENORIGUAL','MAYORQUE','MAYORIGUAL'),
-    ('left','MAS','MENOS'),
-    ('left','DIV','POR','MODULO'),
-    ('nonassoc', 'POTE'),
-    ('right','UMENOS','UMAS'),
+    ('right','IGUAL'),
+    ('left', 'OR'),
+    ('left', 'AND'),
+    ('left', 'UNOT'),
+    ('nonassoc', 'MAYORQUE', 'MENORQUE', 'MAYORIGUAL', 'MENORIGUAL', 'IGUALACION', 'DIFERENCIA'),
+    ('left', 'MAS', 'MENOS'),
+    ('left', 'POR', 'DIV', 'MODULO'),
+    ('right', 'UMENOS'),
+    ('right', 'POTE'),
     )
 
 # Definición de la Gramatica 
@@ -162,6 +173,7 @@ from Interprete.Instrucciones.Println import Println
 from Interprete.Instrucciones.Print import Print
 
 from Interprete.Expresion.Aritmetica import Aritmetica
+from Interprete.Expresion.Relacional import Relacional
 from Interprete.Expresion.Primitivo import Primitivo
 from Interprete.Expresion.Logica import Logica
 from Interprete.TS.Tipo import *
@@ -203,8 +215,7 @@ def p_instruccion_error(t):
     t[0] = ""
 
 def p_fin_instruccion(t) :
-    '''fin_instruccion  : PUNTOCOMA 
-                        |   '''
+    '''fin_instruccion  : PUNTOCOMA'''
     t[0] = None
 
 # --------------------------------------------- IMPRIMIR ---------------------------------------------
@@ -226,7 +237,14 @@ def p_expresion_binaria(t):
             | expresion DIV expresion
             | expresion POTE expresion
             | expresion MODULO expresion
+            | expresion MAYORQUE expresion
+            | expresion MENORQUE expresion
+            | expresion MAYORIGUAL expresion
+            | expresion MENORIGUAL expresion
+            | expresion IGUALACION expresion
+            | expresion DIFERENCIA expresion
     '''
+    # Aritmética
     if t[2] == '+':
         t[0] = Aritmetica(t[1], Operador_Aritmetico.SUMA,   t[3], t.lineno(2), find_column(input, t.slice[2]))
     elif t[2] == '-':
@@ -236,20 +254,31 @@ def p_expresion_binaria(t):
     elif t[2] == '/':
         t[0] = Aritmetica(t[1], Operador_Aritmetico.DIV,    t[3], t.lineno(2), find_column(input, t.slice[2]))   
     elif t[2] == '^':
-        print(t[2])
         t[0] = Aritmetica(t[1], Operador_Aritmetico.POTE,   t[3], t.lineno(2), find_column(input, t.slice[2]))
     elif t[2] == '%':
         t[0] = Aritmetica(t[1], Operador_Aritmetico.MODU,   t[3], t.lineno(2), find_column(input, t.slice[2]))  
+    # Relacional
+    elif t[2] == '>':
+        t[0] = Relacional(t[1], Operador_Relacional.MAYORQUE,   t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '<':
+        t[0] = Relacional(t[1], Operador_Relacional.MENORQUE,   t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '>=':
+        t[0] = Relacional(t[1], Operador_Relacional.MAYORIGUAL, t[3], t.lineno(2), find_column(input, t.slice[2])) 
+    elif t[2] == '<=':
+        t[0] = Relacional(t[1], Operador_Relacional.MENORIGUAL, t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '==':
+        t[0] = Relacional(t[1], Operador_Relacional.IGUALACION, t[3], t.lineno(2), find_column(input, t.slice[2]))
+    elif t[2] == '!=':
+        t[0] = Relacional(t[1], Operador_Relacional.DIFERENCIA, t[3], t.lineno(2), find_column(input, t.slice[2]))
 
 def p_expresion_unaria(t):
     '''expresion : MENOS expresion %prec UMENOS
-                | NOT expresion %prec UNOT 
-                | MAS expresion %prec UMAS'''
+                | NOT expresion %prec UNOT'''
     
     if t[1] == '-':
         t[0] = Aritmetica(t[2], Operador_Aritmetico.UMENOS, None, t.lineno(1), find_column(input, t.slice[1]))
-    elif t[1] == '+':
-        t[0] = Aritmetica(t[2], Operador_Aritmetico.UMAS, None, t.lineno(1), find_column(input, t.slice[1]))
+    # elif t[1] == '+':
+    #     t[0] = Aritmetica(t[2], Operador_Aritmetico.UMAS, None, t.lineno(1), find_column(input, t.slice[1]))
     elif t[1] == '!':
          t[0] = Logica(t[2], Operador_Logico.NOT, None, t.lineno(1), find_column(input, t.slice[1]))
 
@@ -309,7 +338,7 @@ f = open("Backend/src/entrada.txt", "r")
 entrada = f.read()
 f.close()
 
-instrucciones = parse(str(entrada))
+instrucciones = parse(str(entrada)+"\n")
 ast = Arbol(instrucciones)
 TSGlobal = TablaSimbolo()
 ast.set_tabla_ts_global(TSGlobal)
