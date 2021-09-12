@@ -38,7 +38,7 @@ class TablaSimbolo:
         
         while tablaActual != None:
             if simbolo.id in tablaActual.tabla :
-                if tablaActual.tabla[simbolo.id.lower()].get_tipo() == simbolo.get_tipo():
+                if tablaActual.tabla[simbolo.id.lower()].get_tipo() == simbolo.get_tipo() or tablaActual.tabla[simbolo.id.lower()].get_tipo() != simbolo.get_tipo() :
                     tablaActual.tabla[simbolo.id.lower()].set_valor(simbolo.get_valor())
                     tablaActual.tabla[simbolo.id.lower()].set_tipo(simbolo.get_tipo())
                     return None

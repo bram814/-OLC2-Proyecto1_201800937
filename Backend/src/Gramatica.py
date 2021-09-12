@@ -7,6 +7,13 @@ reservadas = {
     'println'  : 'RPRINTLN',
     'true'     : 'RTRUE',
     'false'    : 'RFALSE',
+    'int64'    : 'RINT64',
+    'float64'  : 'RFLOAT64',
+    'bool'     : 'RBOOL',
+    'char'     : 'RCHAR',
+    'string'   : 'RSTRING',
+    'global'   : 'RGLOBAL',
+    'local'    : 'RLOCAL' 
 }
 
 tokens = [
@@ -26,6 +33,7 @@ tokens = [
     'OR',
     'NOT',
     'PUNTOCOMA',
+    'DOSPUNTOS',
     'DOBLEPUNTO',
     'COMA',
     'PARA',
@@ -59,7 +67,8 @@ t_AND           = r'\&\&'
 t_OR            = r'\|\|'
 t_NOT           = r'\!'
 t_PUNTOCOMA     = r'\;'
-t_DOBLEPUNTO    = r'\:'
+t_DOSPUNTOS     = r'\:'
+t_DOBLEPUNTO    = r'\:\:'
 t_COMA          = r'\,'
 t_PARA          = r'\('
 t_PARC          = r'\)'
@@ -145,16 +154,6 @@ def find_column(inp, token):
 import Interprete.ply.lex as lex
 lexer = lex.lex()
 # Asociacion
-# precedence = (
-#     ('left','OR'),
-#     ('left','AND'),
-#     ('right','UNOT'),
-#     ('left','IGUALACION','DIFERENCIA','MENORQUE','MENORIGUAL','MAYORQUE','MAYORIGUAL'),
-#     ('left','MAS','MENOS'),
-#     ('left','DIV','POR','MODULO'),
-#     ('nonassoc', 'POTE'),
-#     ('right','UMENOS'),
-#     )
 precedence = (
     ('right','IGUAL'),
     ('left', 'OR'),
@@ -169,9 +168,12 @@ precedence = (
 
 # Definición de la Gramatica 
 #   Clases Abstractas.
+from Interprete.Instrucciones.Declaracion import Declaracion
+from Interprete.Instrucciones.Asignacion import Asignacion
 from Interprete.Instrucciones.Println import Println
 from Interprete.Instrucciones.Print import Print
 
+from Interprete.Expresion.Identificador import Identificador
 from Interprete.Expresion.Aritmetica import Aritmetica
 from Interprete.Expresion.Relacional import Relacional
 from Interprete.Expresion.Primitivo import Primitivo
@@ -200,8 +202,10 @@ def p_instrucciones_instruccion(t) :
 # --------------------------------------------- INSTRUCCION ---------------------------------------------
 
 def p_instruccion(t):
-    '''instruccion  : ins_print fin_instruccion
-                    | ins_println fin_instruccion
+    '''instruccion  : ins_print
+                    | ins_println
+                    | ins_asignacion
+                    | ins_declaracion
                     | COMENTARIO_VARIAS_LINEAS
                     | COMENTARIO_SIMPLE
     '''
@@ -211,22 +215,97 @@ def p_instruccion(t):
 # ---------------------------------------- ERROR EN PUNTO COMA -------------------------------------------
 def p_instruccion_error(t):
     'instruccion        : error PUNTOCOMA'
-    errores.append(Exception("Sintáctico","Error Sintáctico. " + str(t[1].value) , t.lineno(1), find_column(input, t.slice[1])))
+    errores.append(Exception("Sintáctico","Error Sintáctico. " + str(t[1].value)+ str(t[1].value) , t.lineno(1), find_column(input, t.slice[1])))
     t[0] = ""
 
 def p_fin_instruccion(t) :
-    '''fin_instruccion  : PUNTOCOMA'''
-    t[0] = None
+    '''fin_instruccion  : PUNTOCOMA
+                        | '''
+    if len(t) == 2:
+        t[0] = ";"
+    elif len(t) == 1:
+        t[0] = None
 
 # --------------------------------------------- IMPRIMIR ---------------------------------------------
 def p_imprimir_print(t): # Sin salto de linea
-    'ins_print   : RPRINT PARA expresion PARC'
+    'ins_print   : RPRINT PARA expresion PARC fin_instruccion'
+    if t[5] == None:
+        errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
     t[0] = Print(t[3], t.lineno(1), find_column(input, t.slice[1]))
-
+    
 def p_imprimir_println(t): # Sin salto de linea
-    'ins_println   : RPRINTLN PARA expresion PARC'
+    'ins_println   : RPRINTLN PARA expresion PARC fin_instruccion'
+    if t[5] == None:
+        errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
     t[0] = Println(t[3], t.lineno(1), find_column(input, t.slice[1]))
 
+# --------------------------------------------- ASIGNACIÓN ---------------------------------------------
+def p_instruccion_asignacion(t): # Lista de Asignacion.
+    '''ins_asignacion   : asignacion_tipo 
+                        | asignacion
+    '''
+    t[0] = t[1]
+
+def p_asignacion_(t): # Asignacion -> ID = Expresión;
+    '''asignacion       : ID IGUAL expresion fin_instruccion'''
+    if t[4] == None:
+        errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
+    t[0] = Asignacion(t[1], t[3], None, t.lineno(1), find_column(input, t.slice[1]))
+
+def p_asignacion_tipo(t): # Asignacion -> ID = Expresión :: TIPO
+    '''asignacion_tipo  : ID IGUAL expresion DOBLEPUNTO TIPO fin_instruccion'''
+    if t[6] == None:
+        errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
+    t[0] = Asignacion(t[1], t[3], t[5], t.lineno(1), find_column(input, t.slice[1]))
+
+    # identificador, expresion, fila, columna):
+
+
+# --------------------------------------------- ASIGNACIÓN ---------------------------------------------
+def p_instruccion_declaracion(t):
+    '''ins_declaracion  : declaracion_global
+                        | declaracion_local 
+    '''
+    t[0] = t[1]
+
+def p_declaracion_global(t):
+    '''declaracion_global   : RGLOBAL ID fin_instruccion
+                            | RGLOBAL ID IGUAL expresion fin_instruccion
+    '''
+    if len(t) == 4:
+        if t[3] == None:
+            errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
+        t[0] = Declaracion(t[2], t.lineno(1), find_column(input, t.slice[1]), None)
+    elif len(t) == 6:
+        if t[5] == None:
+            errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
+        t[0] = Declaracion(t[2], t.lineno(1), find_column(input, t.slice[1]), t[4])
+
+
+def p_declaracion_local(t):
+    '''declaracion_local    : RLOCAL ID fin_instruccion'''
+    if t[3] == None:
+            errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
+    t[0] = Declaracion(t[2], t.lineno(1), find_column(input, t.slice[1]), None)
+# --------------------------------------------- TIPO DE DATO ---------------------------------------------
+
+def p_tipo(t):
+    ''' TIPO            : RINT64
+                        | RFLOAT64
+                        | RBOOL
+                        | RCHAR
+                        | RSTRING'''
+
+    if t[1].lower() == 'int64':
+        t[0] = Tipo.INT64
+    elif t[1].lower() == 'float64':
+        t[0] = Tipo.FLOAT64
+    elif t[1].lower() == 'bool':
+        t[0] = Tipo.BOOLEANO
+    elif t[1].lower() == 'char':
+        t[0] = Tipo.CHAR
+    elif t[1].lower() == 'string':
+        t[0] = Tipo.STRING
 # --------------------------------------------- EXPRESION ---------------------------------------------
 
 def p_expresion_binaria(t):
@@ -284,14 +363,17 @@ def p_expresion_unaria(t):
     
     if t[1] == '-':
         t[0] = Aritmetica(t[2], Operador_Aritmetico.UMENOS, None, t.lineno(1), find_column(input, t.slice[1]))
-    # elif t[1] == '+':
-    #     t[0] = Aritmetica(t[2], Operador_Aritmetico.UMAS, None, t.lineno(1), find_column(input, t.slice[1]))
     elif t[1] == '!':
-         t[0] = Logica(t[2], Operador_Logico.NOT, None, t.lineno(1), find_column(input, t.slice[1]))
+        t[0] = Logica(t[2], Operador_Logico.NOT, None, t.lineno(1), find_column(input, t.slice[1]))
+
 
 def p_expresion_agrupacion(t):
     ''' expresion :   PARA expresion PARC '''
     t[0] = t[2]
+
+def p_expresion_identificador(t):
+    '''expresion : ID'''
+    t[0] = Identificador(t[1], t.lineno(1), find_column(input, t.slice[1]))
 
 def p_expresion_entero(t):
     '''expresion : ENTERO'''
