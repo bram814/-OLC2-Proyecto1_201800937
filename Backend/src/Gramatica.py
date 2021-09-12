@@ -13,7 +13,14 @@ reservadas = {
     'char'     : 'RCHAR',
     'string'   : 'RSTRING',
     'global'   : 'RGLOBAL',
-    'local'    : 'RLOCAL' 
+    'local'    : 'RLOCAL',
+    'if'       : 'RIF',
+    'elseif'   : 'RELSEIF',
+    'else'     : 'RELSE',
+    'end'      : 'REND',
+    'break'    : 'RBREAK',
+    'continue' : 'RCONTINUE',
+    'return'   : 'RRETURN'
 }
 
 tokens = [
@@ -170,8 +177,12 @@ precedence = (
 #   Clases Abstractas.
 from Interprete.Instrucciones.Declaracion import Declaracion
 from Interprete.Instrucciones.Asignacion import Asignacion
+from Interprete.Instrucciones.Continue import Continue
 from Interprete.Instrucciones.Println import Println
+from Interprete.Instrucciones.Return import Return
 from Interprete.Instrucciones.Print import Print
+from Interprete.Instrucciones.Break import Break
+from Interprete.Instrucciones.If import If
 
 from Interprete.Expresion.Identificador import Identificador
 from Interprete.Expresion.Aritmetica import Aritmetica
@@ -206,6 +217,10 @@ def p_instruccion(t):
                     | ins_println
                     | ins_asignacion
                     | ins_declaracion
+                    | ins_if
+                    | ins_break
+                    | ins_continue
+                    | ins_return
                     | COMENTARIO_VARIAS_LINEAS
                     | COMENTARIO_SIMPLE
     '''
@@ -261,7 +276,7 @@ def p_asignacion_tipo(t): # Asignacion -> ID = Expresión :: TIPO
     # identificador, expresion, fila, columna):
 
 
-# --------------------------------------------- ASIGNACIÓN ---------------------------------------------
+# --------------------------------------------- ASIGNACIÓN [DECLARACION] ---------------------------------------------
 def p_instruccion_declaracion(t):
     '''ins_declaracion  : declaracion_global
                         | declaracion_local 
@@ -287,8 +302,67 @@ def p_declaracion_local(t):
     if t[3] == None:
             errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
     t[0] = Declaracion(t[2], t.lineno(1), find_column(input, t.slice[1]), None)
-# --------------------------------------------- TIPO DE DATO ---------------------------------------------
 
+
+# --------------------------------------------- CONDICIONAL [IF] ---------------------------------------------
+def p_instruccion_if(t):
+    '''ins_if   : RIF expresion instrucciones REND fin_instruccion
+                | RIF expresion instrucciones RELSE instrucciones REND fin_instruccion
+                | RIF expresion instrucciones ins_list_if REND fin_instruccion
+                | RIF expresion instrucciones ins_list_if RELSE instrucciones REND fin_instruccion
+    '''
+    if len(t) == 6: # [if]
+        if t[5] == None:
+            errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
+        t[0] = If(t[2], t[3], None, None, t.lineno(1), find_column(input, t.slice[1]))
+    elif len(t) == 7: # [if][elseif]
+        if t[6] == None:
+            errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
+        t[0] = If(t[2], t[3], t[4], None, t.lineno(1), find_column(input, t.slice[1]))
+    elif len(t) == 8: # [if][else]
+        if t[7] == None:
+            errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
+        t[0] = If(t[2], t[3], None, t[5], t.lineno(1), find_column(input, t.slice[1]))
+    elif len(t) == 9: # [if][elseif][else]
+        if t[8] == None:
+            errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
+        t[0] = If(t[2], t[3], t[4], t[6], t.lineno(1), find_column(input, t.slice[1]))
+
+def p_ins_list_if(t):
+    '''ins_list_if  : ins_list_if list_if '''
+    if t[2] != "":
+        t[1].append(t[2])
+    t[0] = t[1]
+
+def p_list_if(t):
+    '''ins_list_if : list_if'''
+    if t[1] == "":
+        t[0] = []
+    else:    
+        t[0] = [t[1]]
+
+def p_list_if_elseif(t):
+    '''list_if      : RELSEIF expresion instrucciones'''
+    t[0] = If(t[2], t[3], None, None, t.lineno(1), find_column(input, t.slice[1]))
+
+
+
+# --------------------------------------------- SENTENCIAS DE TRANSFERENCIAS [BREAK] -----------------------------------------------
+def p_instruccion_break(t) :
+    'ins_break      : RBREAK'
+    t[0] = Break(t.lineno(1), find_column(input, t.slice[1]))
+
+# --------------------------------------------- SENTENCIAS DE TRANSFERENCIAS [CONTINUE] --------------------------------------------
+def p_instruccion_return(t) :
+    'ins_return     : RRETURN expresion'
+    t[0] = Return(t[2], t.lineno(1), find_column(input, t.slice[1]))
+
+# --------------------------------------------- SENTENCIAS DE TRANSFERENCIAS [RETURN] ----------------------------------------------
+def p_instruccion_continue(t) :
+    'ins_continue   : RCONTINUE'
+    t[0] = Continue(t.lineno(1), find_column(input, t.slice[1]))
+
+# --------------------------------------------- TIPO DE DATO ---------------------------------------------
 def p_tipo(t):
     ''' TIPO            : RINT64
                         | RFLOAT64
