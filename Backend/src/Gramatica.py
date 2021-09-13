@@ -21,7 +21,9 @@ reservadas = {
     'break'    : 'RBREAK',
     'continue' : 'RCONTINUE',
     'return'   : 'RRETURN',
-    'while'    : 'RWHILE'
+    'while'    : 'RWHILE',
+    'for'      : 'RFOR',
+    'in'       : 'RIN',
 }
 
 tokens = [
@@ -184,6 +186,7 @@ from Interprete.Instrucciones.Return import Return
 from Interprete.Instrucciones.While import While
 from Interprete.Instrucciones.Print import Print
 from Interprete.Instrucciones.Break import Break
+from Interprete.Instrucciones.For import For
 from Interprete.Instrucciones.If import If
 
 from Interprete.Expresion.Identificador import Identificador
@@ -224,6 +227,7 @@ def p_instruccion(t):
                     | ins_continue
                     | ins_return
                     | ins_while
+                    | ins_for
                     | COMENTARIO_VARIAS_LINEAS
                     | COMENTARIO_SIMPLE
     '''
@@ -371,6 +375,18 @@ def p_instruccion_continue(t) :
     'ins_continue   : RCONTINUE fin_instruccion'
     t[0] = Continue(t.lineno(1), find_column(input, t.slice[1]))
 
+# --------------------------------------------- LOOPS [FOR] ----------------------------------------------
+def p_instruccion_for(t):
+    '''ins_for      : RFOR ID RIN expresion DOSPUNTOS expresion instrucciones REND fin_instruccion 
+                    | RFOR ID RIN expresion REND fin_instruccion
+    '''
+    if len(t) == 10:
+        if t[8] == None:
+            errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(8), find_column(input, t.slice[8])))
+        t[0] = For(t[2], t[4], t[6], t[7], t.lineno(1), find_column(input, t.slice[1]))
+    elif len(t) == 7:
+        pass
+
 # --------------------------------------------- TIPO DE DATO ---------------------------------------------
 def p_tipo(t):
     ''' TIPO            : RINT64
@@ -453,6 +469,10 @@ def p_expresion_unaria(t):
 def p_expresion_agrupacion(t):
     ''' expresion :   PARA expresion PARC '''
     t[0] = t[2]
+
+def p_expresion_coma(t):
+    '''expresion    :   expresion COMA expresion'''
+    t[0] = Aritmetica(t[1], Operador_Aritmetico.COMA, t[3], t.lineno(2), find_column(input, t.slice[2]))
 
 def p_expresion_identificador(t):
     '''expresion : ID'''
