@@ -21,6 +21,7 @@ class Operador_Aritmetico(Enum):
     MODU        = 6  # modulo (%)
     UMENOS      = 7  # unario (-)
     UMAS        = 8  # unario (+)
+    COMA        = 9  # print(E,E)
 
 class Operador_Relacional(Enum):
     
