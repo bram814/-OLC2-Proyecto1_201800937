@@ -16,17 +16,17 @@ class TablaSimbolo:
         self.funciones = []
 
     def setTabla(self, simbolo):      # Agregar una variable
-        if simbolo.id.lower() in self.tabla :
+        if simbolo.id in self.tabla :
             return Exception("Semantico", "Variable " + simbolo.id + " ya existe", simbolo.fila, simbolo.columna)
         else:
-            self.tabla[simbolo.id.lower()] = simbolo
+            self.tabla[simbolo.id] = simbolo
             return None
 
     def getTabla(self, id):            # obtener una variable
         tablaActual = self
         while tablaActual.tabla != None:
-            if id.lower() in tablaActual.tabla :
-                return tablaActual.tabla[id.lower()]
+            if id in tablaActual.tabla :
+                return tablaActual.tabla[id]
             else:
                 tablaActual = tablaActual.anterior
                 if tablaActual is None:
@@ -38,9 +38,9 @@ class TablaSimbolo:
         
         while tablaActual != None:
             if simbolo.id in tablaActual.tabla :
-                if tablaActual.tabla[simbolo.id.lower()].get_tipo() == simbolo.get_tipo() or tablaActual.tabla[simbolo.id.lower()].get_tipo() != simbolo.get_tipo() :
-                    tablaActual.tabla[simbolo.id.lower()].set_valor(simbolo.get_valor())
-                    tablaActual.tabla[simbolo.id.lower()].set_tipo(simbolo.get_tipo())
+                if tablaActual.tabla[simbolo.id].get_tipo() == simbolo.get_tipo() or tablaActual.tabla[simbolo.id].get_tipo() != simbolo.get_tipo() :
+                    tablaActual.tabla[simbolo.id].set_valor(simbolo.get_valor())
+                    tablaActual.tabla[simbolo.id].set_tipo(simbolo.get_tipo())
                     return None
                 return Exception("Semantico", "Tipo de dato Diferente en Asignacion", simbolo.get_fila(), simbolo.get_columna()) 
             else:

@@ -106,7 +106,7 @@ def t_ENTERO(t):
 
 def t_ID(t):
      r'[a-zA-Z][a-zA-Z_0-9]*'
-     t.type = reservadas.get(t.value.lower(),'ID')
+     t.type = reservadas.get(t.value,'ID')
      return t
 
 def t_CADENA(t):
@@ -395,15 +395,15 @@ def p_tipo(t):
                         | RCHAR
                         | RSTRING'''
 
-    if t[1].lower() == 'int64':
+    if t[1] == 'int64':
         t[0] = Tipo.INT64
-    elif t[1].lower() == 'float64':
+    elif t[1] == 'float64':
         t[0] = Tipo.FLOAT64
-    elif t[1].lower() == 'bool':
+    elif t[1] == 'bool':
         t[0] = Tipo.BOOLEANO
-    elif t[1].lower() == 'char':
+    elif t[1] == 'char':
         t[0] = Tipo.CHAR
-    elif t[1].lower() == 'string':
+    elif t[1] == 'string':
         t[0] = Tipo.STRING
 # --------------------------------------------- EXPRESION ---------------------------------------------
 

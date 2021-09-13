@@ -10,7 +10,7 @@ class Identificador(Instruccion):
         self.tipo = None
 
     def interpretar(self, tree, table):
-        simbolo = table.getTabla(self.identificador.lower())
+        simbolo = table.getTabla(self.identificador)
         if simbolo == None:
             return Exception("Semantico", "Variable " + self.identificador + " no encontrada.", self.fila, self.columna)
 

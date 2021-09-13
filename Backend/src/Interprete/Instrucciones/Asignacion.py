@@ -20,12 +20,12 @@ class Asignacion(Instruccion):
             return Exception("Semantico", "Error de tipo, no se puede convertir de " + str(self.expresion.tipo) + " a " + str(self.tipo), self.fila, self.columna)
         self.tipo = self.expresion.tipo
 
-        simbolo = table.getTabla(self.identificador.lower()) # Va a buscar el ID a la tabla de simbolo.
+        simbolo = table.getTabla(self.identificador) # Va a buscar el ID a la tabla de simbolo.
         if simbolo == None: # Si no Existe lo declara, lo agrega a la tabla de simbolo.
-            simbolo = Simbolo(str(self.identificador).lower(), self.expresion.tipo, self.fila, self.columna, value)
+            simbolo = Simbolo(str(self.identificador), self.expresion.tipo, self.fila, self.columna, value)
             result = table.setTabla(simbolo)
         else: # Si ya Existe el simbolo, lo actualiza en la tabla de simbolos.
-            simbolo = Simbolo(str(self.identificador).lower(), self.expresion.tipo, self.fila, self.columna, value)
+            simbolo = Simbolo(str(self.identificador), self.expresion.tipo, self.fila, self.columna, value)
             result = table.actualizarTabla(simbolo)
         
         if isinstance(result, Exception): return result
