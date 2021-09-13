@@ -20,7 +20,8 @@ reservadas = {
     'end'      : 'REND',
     'break'    : 'RBREAK',
     'continue' : 'RCONTINUE',
-    'return'   : 'RRETURN'
+    'return'   : 'RRETURN',
+    'while'    : 'RWHILE'
 }
 
 tokens = [
@@ -180,6 +181,7 @@ from Interprete.Instrucciones.Asignacion import Asignacion
 from Interprete.Instrucciones.Continue import Continue
 from Interprete.Instrucciones.Println import Println
 from Interprete.Instrucciones.Return import Return
+from Interprete.Instrucciones.While import While
 from Interprete.Instrucciones.Print import Print
 from Interprete.Instrucciones.Break import Break
 from Interprete.Instrucciones.If import If
@@ -221,6 +223,7 @@ def p_instruccion(t):
                     | ins_break
                     | ins_continue
                     | ins_return
+                    | ins_while
                     | COMENTARIO_VARIAS_LINEAS
                     | COMENTARIO_SIMPLE
     '''
@@ -346,20 +349,26 @@ def p_list_if_elseif(t):
     t[0] = If(t[2], t[3], None, None, t.lineno(1), find_column(input, t.slice[1]))
 
 
+# --------------------------------------------- CONDICIONAL [WHILE] ---------------------------------------------
+def p_instruccion_while(t):
+    '''ins_while    : RWHILE expresion instrucciones REND fin_instruccion'''
+    if t[5] == None:
+        errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
+    t[0] = While(t[2], t[3], t.lineno(1), find_column(input, t.slice[1]))
 
 # --------------------------------------------- SENTENCIAS DE TRANSFERENCIAS [BREAK] -----------------------------------------------
 def p_instruccion_break(t) :
-    'ins_break      : RBREAK'
+    'ins_break      : RBREAK fin_instruccion'
     t[0] = Break(t.lineno(1), find_column(input, t.slice[1]))
 
 # --------------------------------------------- SENTENCIAS DE TRANSFERENCIAS [CONTINUE] --------------------------------------------
 def p_instruccion_return(t) :
-    'ins_return     : RRETURN expresion'
+    'ins_return     : RRETURN expresion fin_instruccion'
     t[0] = Return(t[2], t.lineno(1), find_column(input, t.slice[1]))
 
 # --------------------------------------------- SENTENCIAS DE TRANSFERENCIAS [RETURN] ----------------------------------------------
 def p_instruccion_continue(t) :
-    'ins_continue   : RCONTINUE'
+    'ins_continue   : RCONTINUE fin_instruccion'
     t[0] = Continue(t.lineno(1), find_column(input, t.slice[1]))
 
 # --------------------------------------------- TIPO DE DATO ---------------------------------------------
@@ -516,6 +525,18 @@ for instruccion in ast.get_instruccion():
     if isinstance(value, Exception):
         ast.get_excepcion().append(value)
         ast.update_consola(value.__str__())
+    if isinstance(value, Break): 
+        mistake = Exception("Semantico", "Sentencia Break fuera de ciclo", instruccion.fila, instruccion.columna)
+        ast.get_excepcion().append(mistake)
+        ast.update_consola(mistake.__str__())
+    if isinstance(value, Continue): 
+        mistake = Exception("Semantico", "Sentencia Continue fuera de ciclo", instruccion.fila, instruccion.columna)
+        ast.get_excepcion().append(mistake)
+        ast.update_consola(mistake.__str__())
+    if isinstance(value, Return): 
+        mistake = Exception("Semantico", "Sentencia Return fuera de ciclo", instruccion.fila, instruccion.columna)
+        ast.get_excepcion().append(mistake)
+        ast.update_consola(mistake.__str__())
 
 
 print(ast.get_consola())
