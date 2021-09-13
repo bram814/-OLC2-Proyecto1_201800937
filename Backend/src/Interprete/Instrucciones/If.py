@@ -1,6 +1,8 @@
 from Interprete.Abstract.Instruccion import Instruccion
 from Interprete.TS.TablaSimbolo import TablaSimbolo
 from Interprete.Instrucciones.Break import Break
+from Interprete.Instrucciones.Return import Return 
+from Interprete.Instrucciones.Continue import Continue
 from Interprete.TS.Tipo import Tipo
 
 class If(Instruccion):
@@ -19,7 +21,7 @@ class If(Instruccion):
         if isinstance(cond, Exception): return cond
 
         if self.condicion.tipo == Tipo.BOOLEANO:
-            
+
             if bool(cond) == True:
                 new_table = TablaSimbolo(table)
                 for instruccion in self.ins_if:
@@ -28,6 +30,8 @@ class If(Instruccion):
                         tree.get_excepcion().append(result)
                         tree.update_consola(result.__str__())
                     if isinstance(result, Break): return result
+                    if isinstance(result, Return): return result
+                    if isinstance(result, Continue): return result
             else:
                 if self.ins_elseif != None:
                     new_table = TablaSimbolo(table)
@@ -38,7 +42,9 @@ class If(Instruccion):
                         if isinstance(result, Exception):
                             tree.get_excepcion().append(result)
                             tree.update_consola(result.__str__()) 
-                        # if isinstance(result, Break): return result
+                        if isinstance(result, Break): return result    
+                        if isinstance(result, Return): return result
+                        if isinstance(result, Continue): return result
                         if(self.flag == True): break
 
                 if self.ins_else != None and self.flag != True:
@@ -48,7 +54,9 @@ class If(Instruccion):
                         if isinstance(result, Exception):
                             tree.get_excepcion().append(result)
                             tree.update_consola(result.__str__())       
-                        # if isinstance(result, Break): return result
+                        if isinstance(result, Break): return result
+                        if isinstance(result, Return): return result
+                        if isinstance(result, Continue): return result
 
         else:
             return Exception("Semantico", "Tipo de Dato no Booleano en If.", self.fila, self.columna)
