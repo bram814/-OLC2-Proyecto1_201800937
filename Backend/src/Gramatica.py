@@ -7,11 +7,11 @@ reservadas = {
     'println'  : 'RPRINTLN',
     'true'     : 'RTRUE',
     'false'    : 'RFALSE',
-    'int64'    : 'RINT64',
-    'float64'  : 'RFLOAT64',
-    'bool'     : 'RBOOL',
-    'char'     : 'RCHAR',
-    'string'   : 'RSTRING',
+    'Int64'    : 'RINT64',
+    'Float64'  : 'RFLOAT64',
+    'Bool'     : 'RBOOL',
+    'Char'     : 'RCHAR',
+    'String'   : 'RSTRING',
     'global'   : 'RGLOBAL',
     'local'    : 'RLOCAL',
     'if'       : 'RIF',
@@ -378,14 +378,17 @@ def p_instruccion_continue(t) :
 # --------------------------------------------- LOOPS [FOR] ----------------------------------------------
 def p_instruccion_for(t):
     '''ins_for      : RFOR ID RIN expresion DOSPUNTOS expresion instrucciones REND fin_instruccion 
-                    | RFOR ID RIN expresion REND fin_instruccion
+                    | RFOR ID RIN expresion instrucciones REND fin_instruccion
     '''
     if len(t) == 10:
         if t[8] == None:
             errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(8), find_column(input, t.slice[8])))
         t[0] = For(t[2], t[4], t[6], t[7], t.lineno(1), find_column(input, t.slice[1]))
-    elif len(t) == 7:
-        pass
+    elif len(t) == 8:
+        if t[7] == None:
+            errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(6), find_column(input, t.slice[6])))
+        t[0] = For(t[2], t[4], None, t[5], t.lineno(1), find_column(input, t.slice[1]))
+    
 
 # --------------------------------------------- TIPO DE DATO ---------------------------------------------
 def p_tipo(t):
@@ -395,15 +398,15 @@ def p_tipo(t):
                         | RCHAR
                         | RSTRING'''
 
-    if t[1] == 'int64':
+    if t[1] == 'Int64':
         t[0] = Tipo.INT64
-    elif t[1] == 'float64':
+    elif t[1] == 'Float64':
         t[0] = Tipo.FLOAT64
-    elif t[1] == 'bool':
+    elif t[1] == 'Bool':
         t[0] = Tipo.BOOLEANO
-    elif t[1] == 'char':
+    elif t[1] == 'Char':
         t[0] = Tipo.CHAR
-    elif t[1] == 'string':
+    elif t[1] == 'String':
         t[0] = Tipo.STRING
 # --------------------------------------------- EXPRESION ---------------------------------------------
 
