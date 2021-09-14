@@ -10,11 +10,13 @@ class Println(Instruccion):
 
     
     def interpretar(self, tree, table):
-        value = self.expresion.interpretar(tree, table)
 
-        if isinstance(value, Exception): return value
-        
-        tree.update_consola(value)
+        for instruccion in self.expresion:
+            value = instruccion.interpretar(tree, table)
+            if isinstance(value, Exception): return value
+            tree.update_consola_(value)
+
+        tree.update_consola("");
 
     def AST(self):
         pass

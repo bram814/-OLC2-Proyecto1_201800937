@@ -10,11 +10,12 @@ class Print(Instruccion):
 
     
     def interpretar(self, tree, table):
-        value = self.expresion.interpretar(tree, table)
+        for instruccion in self.expresion:
+            value = instruccion.interpretar(tree, table)
 
-        if isinstance(value, Exception): return value
+            if isinstance(value, Exception): return value
 
-        tree.update_consola_(value)
+            tree.update_consola_(value)
 
     def AST(self):
         pass
