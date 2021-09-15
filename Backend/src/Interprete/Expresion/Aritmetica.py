@@ -148,12 +148,6 @@ class Aritmetica(Instruccion):
                 return - self.casteo(self.exp_left.tipo, left)
             return Exception("Semantico", "Tipo Erroneo de operacion para - unario.", self.fila, self.columna)
 
-        elif self.operador == Operador_Aritmetico.COMA:
-            # if self.exp_left.tipo == Tipo.STRING and self.exp_rigth.tipo == Tipo.STRING:
-            self.tipo = Tipo.STRING
-            return str(self.casteo(self.exp_left.tipo, left)) + str(self.casteo(self.exp_rigth.tipo, rigth))
-            # return Exception("Semantico", "Tipo Erroneo de concatenación para coma(,).", self.fila, self.columna)
-        
         return Exception("Semantico", "Tipo de Operacion Aritmética no Especificado.", self.fila, self.columna)    
 
     def AST(self):
