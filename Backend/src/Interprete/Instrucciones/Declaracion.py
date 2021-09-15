@@ -19,11 +19,16 @@ class Declaracion(Instruccion):
         else:
             value = None
 
-        simbolo = Simbolo(str(self.identificador), self.tipo, self.fila, self.columna, value)
-        
-        result = table.setTabla(simbolo)
-        if isinstance(result, Exception): return result
-        
+        simbolo = table.getTabla(self.identificador)
+        if simbolo == None:
+            simbolo = Simbolo(str(self.identificador), self.tipo, self.fila, self.columna, value)
+            result = table.setTabla(simbolo)
+            if isinstance(result, Exception): return result
+        else: # Si ya Existe el simbolo, lo actualiza en la tabla de simbolos.
+            simbolo = Simbolo(str(self.identificador), self.expresion.tipo, self.fila, self.columna, value)
+            result = table.actualizarTabla(simbolo)
+
+
         return None
     
     def AST(self):
