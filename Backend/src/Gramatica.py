@@ -24,6 +24,7 @@ reservadas = {
     'while'    : 'RWHILE',
     'for'      : 'RFOR',
     'in'       : 'RIN',
+    'function' : 'RFUNCTION',
 }
 
 tokens = [
@@ -182,6 +183,8 @@ from Interprete.Instrucciones.Declaracion import Declaracion
 from Interprete.Instrucciones.Asignacion import Asignacion
 from Interprete.Instrucciones.Continue import Continue
 from Interprete.Instrucciones.Println import Println
+from Interprete.Instrucciones.Llamada import Llamada
+from Interprete.Instrucciones.Funcion import Funcion
 from Interprete.Instrucciones.Return import Return
 from Interprete.Instrucciones.While import While
 from Interprete.Instrucciones.Print import Print
@@ -228,6 +231,8 @@ def p_instruccion(t):
                     | ins_return
                     | ins_while
                     | ins_for
+                    | ins_funcion
+                    | ins_llamada
                     | COMENTARIO_VARIAS_LINEAS
                     | COMENTARIO_SIMPLE
     '''
@@ -237,7 +242,7 @@ def p_instruccion(t):
 # ---------------------------------------- ERROR EN PUNTO COMA -------------------------------------------
 def p_instruccion_error(t):
     'instruccion        : error PUNTOCOMA'
-    errores.append(Exception("Sintáctico","Error Sintáctico. " + str(t[1].value)+ str(t[1].value) , t.lineno(1), find_column(input, t.slice[1])))
+    errores.append(Exception("Sintáctico","Error Sintáctico. " + str(t[1].value) , t.lineno(1), find_column(input, t.slice[1])))
     t[0] = ""
 
 def p_fin_instruccion(t) :
@@ -250,17 +255,30 @@ def p_fin_instruccion(t) :
 
 # --------------------------------------------- IMPRIMIR ---------------------------------------------
 def p_imprimir_print(t): # Sin salto de linea
-    'ins_print   : RPRINT PARA expresion PARC fin_instruccion'
+    'ins_print   : RPRINT PARA listExp PARC fin_instruccion'
     if t[5] == None:
         errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
     t[0] = Print(t[3], t.lineno(1), find_column(input, t.slice[1]))
     
 def p_imprimir_println(t): # Sin salto de linea
-    'ins_println   : RPRINTLN PARA expresion PARC fin_instruccion'
+    'ins_println   : RPRINTLN PARA listExp PARC fin_instruccion'
     if t[5] == None:
         errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
     t[0] = Println(t[3], t.lineno(1), find_column(input, t.slice[1]))
 
+def p_list_coma_exp(t) :
+    'listExp    : listExp  COMA sal_exp'
+    t[1].append(t[3])
+    t[0] = t[1]
+    
+def p_list_list_coma_exp(t) :
+    'listExp    : sal_exp'
+    t[0] = [t[1]]
+
+def p_list_ex(t):
+    'sal_exp    : expresion'
+    t[0] = t[1]
+    
 # --------------------------------------------- ASIGNACIÓN ---------------------------------------------
 def p_instruccion_asignacion(t): # Lista de Asignacion.
     '''ins_asignacion   : asignacion_tipo 
@@ -315,51 +333,35 @@ def p_declaracion_local(t):
 def p_instruccion_if(t):
     '''ins_if   : RIF expresion instrucciones REND fin_instruccion
                 | RIF expresion instrucciones RELSE instrucciones REND fin_instruccion
-                | RIF expresion instrucciones ins_list_if REND fin_instruccion
-                | RIF expresion instrucciones ins_list_if RELSE instrucciones REND fin_instruccion
+                | RIF expresion instrucciones list_elseif REND fin_instruccion
     '''
     if len(t) == 6: # [if]
         if t[5] == None:
             errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
         t[0] = If(t[2], t[3], None, None, t.lineno(1), find_column(input, t.slice[1]))
-    elif len(t) == 7: # [if][elseif]
-        if t[6] == None:
-            errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
-        t[0] = If(t[2], t[3], t[4], None, t.lineno(1), find_column(input, t.slice[1]))
+    
     elif len(t) == 8: # [if][else]
         if t[7] == None:
             errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
-        t[0] = If(t[2], t[3], None, t[5], t.lineno(1), find_column(input, t.slice[1]))
-    elif len(t) == 9: # [if][elseif][else]
-        if t[8] == None:
+        t[0] = If(t[2], t[3], t[5], None, t.lineno(1), find_column(input, t.slice[1]))
+    
+    elif len(t) == 7: # [if][elseif] | [IF][ELSEIF][ELSE]
+        if t[6] == None:
             errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
-        t[0] = If(t[2], t[3], t[4], t[6], t.lineno(1), find_column(input, t.slice[1]))
-
-def p_ins_list_if(t):
-    '''ins_list_if  : ins_list_if list_if '''
-    if t[2] != "":
-        t[1].append(t[2])
-    t[0] = t[1]
-
-def p_list_if(t):
-    '''ins_list_if : list_if'''
-    if t[1] == "":
-        t[0] = []
-    else:    
-        t[0] = [t[1]]
-
-def p_list_if_elseif(t):
-    '''list_if      : RELSEIF expresion instrucciones'''
-    t[0] = If(t[2], t[3], None, None, t.lineno(1), find_column(input, t.slice[1]))
-
-
-# --------------------------------------------- CONDICIONAL [WHILE] ---------------------------------------------
-def p_instruccion_while(t):
-    '''ins_while    : RWHILE expresion instrucciones REND fin_instruccion'''
-    if t[5] == None:
-        errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
-    t[0] = While(t[2], t[3], t.lineno(1), find_column(input, t.slice[1]))
-
+        t[0] = If(t[2], t[3], None, t[4], t.lineno(1), find_column(input, t.slice[1]))
+    
+def p_list_elseif_instruccion(t):
+    '''list_elseif  : RELSEIF expresion instrucciones
+                    | RELSEIF expresion instrucciones list_elseif
+                    | RELSEIF expresion instrucciones RELSE instrucciones
+    '''
+    if len(t) == 4:
+        t[0] = If(t[2], t[3], None, None, t.lineno(1), find_column(input, t.slice[1]))
+    elif len(t) == 5:
+        t[0] = If(t[2], t[3], None, t[4], t.lineno(1), find_column(input, t.slice[1]))
+    elif len(t) == 6:
+        t[0] = If(t[2], t[3], t[5], None, t.lineno(1), find_column(input, t.slice[1]))
+    
 # --------------------------------------------- SENTENCIAS DE TRANSFERENCIAS [BREAK] -----------------------------------------------
 def p_instruccion_break(t) :
     'ins_break      : RBREAK fin_instruccion'
@@ -375,6 +377,13 @@ def p_instruccion_continue(t) :
     'ins_continue   : RCONTINUE fin_instruccion'
     t[0] = Continue(t.lineno(1), find_column(input, t.slice[1]))
 
+# --------------------------------------------- lOOPS [WHILE] ---------------------------------------------
+def p_instruccion_while(t):
+    '''ins_while    : RWHILE expresion instrucciones REND fin_instruccion'''
+    if t[5] == None:
+        errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
+    t[0] = While(t[2], t[3], t.lineno(1), find_column(input, t.slice[1]))
+
 # --------------------------------------------- LOOPS [FOR] ----------------------------------------------
 def p_instruccion_for(t):
     '''ins_for      : RFOR ID RIN expresion DOSPUNTOS expresion instrucciones REND fin_instruccion 
@@ -382,14 +391,64 @@ def p_instruccion_for(t):
     '''
     if len(t) == 10:
         if t[8] == None:
-            errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(8), find_column(input, t.slice[8])))
+            errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
         t[0] = For(t[2], t[4], t[6], t[7], t.lineno(1), find_column(input, t.slice[1]))
     elif len(t) == 8:
         if t[7] == None:
-            errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(6), find_column(input, t.slice[6])))
+            errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
         t[0] = For(t[2], t[4], None, t[5], t.lineno(1), find_column(input, t.slice[1]))
-    
 
+ 
+# --------------------------------------------- FUNCIONES [CREATE FUNCTION] ----------------------------------------------
+def p_instruccion_funcion(t):
+    '''ins_funcion  : RFUNCTION ID PARA PARC instrucciones REND fin_instruccion
+                    | RFUNCTION ID PARA parametros PARC instrucciones REND fin_instruccion
+    '''
+    if len(t) == 8:
+        if t[7] == None:
+            errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
+        t[0] = Funcion(t[2], [], t[5], t.lineno(1), find_column(input, t.slice[1]))
+    
+    elif len(t) == 9:
+        if t[8] == None:
+            errores.append(Exception("Sintáctico","Error Sintáctico, falta \";\". ", t.lineno(1), find_column(input, t.slice[1])))
+        t[0] = Funcion(t[2], t[4], t[6], t.lineno(1), find_column(input, t.slice[1]))
+
+def p_parametros_parametros(t) :
+    'parametros     : parametros COMA parametro'
+    t[1].append(t[3])
+    t[0] = t[1]
+    
+def p_parametros_parametro(t) :
+    'parametros    : parametro'
+    t[0] = [t[1]]
+
+def p_parametro(t) :
+    'parametro     : ID DOBLEPUNTO TIPO'
+    t[0] = {'tipoDato':t[3],'identificador':t[1]} # Create Dicctionary.
+
+# --------------------------------------------- FUNCIONES [CALL FUNCTION] ----------------------------------------------
+def p_instruccion_llamada(t) :
+    'ins_llamada     : ID PARA PARC fin_instruccion'
+    t[0] = Llamada(t[1], [], t.lineno(1), find_column(input, t.slice[1]))
+
+
+def p_instruccion_llamada_params(t) :
+    'ins_llamada     : ID PARA listParams PARC fin_instruccion'
+    t[0] = Llamada(t[1], t[3], t.lineno(1), find_column(input, t.slice[1]))
+
+def p_list_params_params(t) :
+    'listParams    : listParams COMA listParam'
+    t[1].append(t[3])
+    t[0] = t[1]
+    
+def p_list_params_param(t) :
+    'listParams    : listParam'
+    t[0] = [t[1]]
+
+def p_list_param(t):
+    'listParam    : expresion'
+    t[0] = t[1]
 # --------------------------------------------- TIPO DE DATO ---------------------------------------------
 def p_tipo(t):
     ''' TIPO            : RINT64
@@ -468,14 +527,9 @@ def p_expresion_unaria(t):
     elif t[1] == '!':
         t[0] = Logica(t[2], Operador_Logico.NOT, None, t.lineno(1), find_column(input, t.slice[1]))
 
-
 def p_expresion_agrupacion(t):
     ''' expresion :   PARA expresion PARC '''
     t[0] = t[2]
-
-def p_expresion_coma(t):
-    '''expresion    :   expresion COMA expresion'''
-    t[0] = Aritmetica(t[1], Operador_Aritmetico.COMA, t[3], t.lineno(2), find_column(input, t.slice[2]))
 
 def p_expresion_identificador(t):
     '''expresion : ID'''
@@ -505,6 +559,9 @@ def p_primitivo_false(t):
     '''expresion : RFALSE'''
     t[0] = Primitivo(Tipo.BOOLEANO, False, t.lineno(1), find_column(input, t.slice[1]))
 
+def p_expresion_llamada(t):
+    '''expresion : ins_llamada'''
+    t[0] = t[1]
 
 import Interprete.ply.yacc as yacc
 parser = yacc.yacc()
@@ -544,22 +601,25 @@ for error in errores:
     ast.update_consola(error.__str__()) # Lo actualiza en consola (lo muestra)
 
 for instruccion in ast.get_instruccion():
-    value = instruccion.interpretar(ast, TSGlobal)
-    if isinstance(value, Exception):
-        ast.get_excepcion().append(value)
-        ast.update_consola(value.__str__())
-    if isinstance(value, Break): 
-        mistake = Exception("Semantico", "Sentencia Break fuera de ciclo", instruccion.fila, instruccion.columna)
-        ast.get_excepcion().append(mistake)
-        ast.update_consola(mistake.__str__())
-    if isinstance(value, Continue): 
-        mistake = Exception("Semantico", "Sentencia Continue fuera de ciclo", instruccion.fila, instruccion.columna)
-        ast.get_excepcion().append(mistake)
-        ast.update_consola(mistake.__str__())
-    if isinstance(value, Return): 
-        mistake = Exception("Semantico", "Sentencia Return fuera de ciclo", instruccion.fila, instruccion.columna)
-        ast.get_excepcion().append(mistake)
-        ast.update_consola(mistake.__str__())
+    if isinstance(instruccion, Funcion): 
+        ast.addFuncion(instruccion)
+    else:
+        value = instruccion.interpretar(ast, TSGlobal)
+        if isinstance(value, Exception):
+            ast.get_excepcion().append(value)
+            ast.update_consola(value.__str__())
+        if isinstance(value, Break): 
+            mistake = Exception("Semantico", "Break fuera de Bucle", instruccion.fila, instruccion.columna)
+            ast.get_excepcion().append(mistake)
+            ast.update_consola(mistake.__str__())
+        if isinstance(value, Continue): 
+            mistake = Exception("Semantico", "Continue fuera de Bucle", instruccion.fila, instruccion.columna)
+            ast.get_excepcion().append(mistake)
+            ast.update_consola(mistake.__str__())
+        if isinstance(value, Return): 
+            mistake = Exception("Semantico", "Return fuera de Bucle", instruccion.fila, instruccion.columna)
+            ast.get_excepcion().append(mistake)
+            ast.update_consola(mistake.__str__())
 
 
 print(ast.get_consola())
