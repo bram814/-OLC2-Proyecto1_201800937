@@ -1,6 +1,20 @@
+from Interprete.TS.Exception import Exception
+from Interprete.Nativas.UpperCase import UpperCase
+from Interprete.Nativas.LowerCase import LowerCase
+from Interprete.Nativas.Tangente import Tangente
+from Interprete.Nativas.String import String
+from Interprete.Nativas.TypeOf import TypeOf
+from Interprete.Nativas.Length import Length
+from Interprete.Nativas.Coseno import Coseno
+from Interprete.Nativas.Log10 import Log10
+from Interprete.Nativas.Trunc import Trunc
+from Interprete.Nativas.Parse import Parse
+from Interprete.Nativas.Float import Float
+from Interprete.Nativas.Sqrt import Sqrt
+from Interprete.Nativas.Seno import Seno
+from Interprete.Nativas.Log import Log
 import re
 import os
-from Interprete.TS.Exception import Exception
 errores = []
 reservadas = {
     'print'    : 'RPRINT',
@@ -25,6 +39,8 @@ reservadas = {
     'for'      : 'RFOR',
     'in'       : 'RIN',
     'function' : 'RFUNCTION',
+    'nothing'  : 'RNOTHING',
+    'parse'    : 'RPARSE',
 }
 
 tokens = [
@@ -106,9 +122,9 @@ def t_ENTERO(t):
     return t
 
 def t_ID(t):
-     r'[a-zA-Z][a-zA-Z_0-9]*'
-     t.type = reservadas.get(t.value,'ID')
-     return t
+    r'[a-zA-Z][a-zA-Z_0-9]*'
+    t.type = reservadas.get(t.value,'ID')
+    return t
 
 def t_CADENA(t):
     r'\"(\\"|.)*?\"'
@@ -166,15 +182,14 @@ import Interprete.ply.lex as lex
 lexer = lex.lex()
 # Asociacion
 precedence = (
-    ('right','IGUAL'),
-    ('left', 'OR'),
-    ('left', 'AND'),
-    ('left', 'UNOT'),
-    ('nonassoc', 'MAYORQUE', 'MENORQUE', 'MAYORIGUAL', 'MENORIGUAL', 'IGUALACION', 'DIFERENCIA'),
-    ('left', 'MAS', 'MENOS'),
-    ('left', 'POR', 'DIV', 'MODULO'),
-    ('right', 'UMENOS'),
-    ('right', 'POTE'),
+    ('left','OR'),
+    ('left','AND'),
+    ('right','UNOT'),
+    ('left','IGUALACION','DIFERENCIA','MENORQUE','MENORIGUAL','MAYORQUE','MAYORIGUAL'),
+    ('left','MAS','MENOS'),
+    ('left','DIV','POR','MODULO'),
+    ('nonassoc', 'POTE'),
+    ('right','UMENOS'),
     )
 
 # Definición de la Gramatica 
@@ -232,7 +247,7 @@ def p_instruccion(t):
                     | ins_while
                     | ins_for
                     | ins_funcion
-                    | ins_llamada
+                    | ins_llamada fin_instruccion
                     | COMENTARIO_VARIAS_LINEAS
                     | COMENTARIO_SIMPLE
     '''
@@ -429,14 +444,37 @@ def p_parametro(t) :
 
 # --------------------------------------------- FUNCIONES [CALL FUNCTION] ----------------------------------------------
 def p_instruccion_llamada(t) :
-    'ins_llamada     : ID PARA PARC fin_instruccion'
+    'ins_llamada     : ID PARA PARC'
     t[0] = Llamada(t[1], [], t.lineno(1), find_column(input, t.slice[1]))
 
 
 def p_instruccion_llamada_params(t) :
-    'ins_llamada     : ID PARA listParams PARC fin_instruccion'
+    'ins_llamada     : ID PARA listParams PARC'
     t[0] = Llamada(t[1], t[3], t.lineno(1), find_column(input, t.slice[1]))
 
+def p_instruccion_llamada_parse(t):
+    'ins_llamada     : RPARSE PARA listParse PARC'
+    t[0] = Llamada(t[1], t[3], t.lineno(1), find_column(input, t.slice[1]))
+
+def p_list_parse(t):
+    '''listParse    :   listParse COMA expresion'''
+    t[1].append(t[3])
+    t[0] = t[1]
+
+def p_list_parse_(t):
+    '''listParse    : parseFloat'''
+    t[0] = [t[1]]
+
+def p_list_float_parse(t):
+    '''parseFloat   : RFLOAT64
+                    | RINT64
+    '''
+    if t[1] == 'Float64':
+        t[0] = Primitivo(Tipo.STRING, str(t[1]), t.lineno(1), find_column(input, t.slice[1]))
+    elif t[1] == 'Int64':
+        t[0] = Primitivo(Tipo.STRING, str(t[1]), t.lineno(1), find_column(input, t.slice[1]))
+        
+        
 def p_list_params_params(t) :
     'listParams    : listParams COMA listParam'
     t[1].append(t[3])
@@ -449,6 +487,7 @@ def p_list_params_param(t) :
 def p_list_param(t):
     'listParam    : expresion'
     t[0] = t[1]
+
 # --------------------------------------------- TIPO DE DATO ---------------------------------------------
 def p_tipo(t):
     ''' TIPO            : RINT64
@@ -559,6 +598,10 @@ def p_primitivo_false(t):
     '''expresion : RFALSE'''
     t[0] = Primitivo(Tipo.BOOLEANO, False, t.lineno(1), find_column(input, t.slice[1]))
 
+# def p_primitivo_None(t):
+#     '''expresion : RNOTHING'''
+#     t[0] = Primitivo(Tipo.NULO, None, t.lineno(1), find_column(input, t.slice[1]))
+
 def p_expresion_llamada(t):
     '''expresion : ins_llamada'''
     t[0] = t[1]
@@ -582,6 +625,93 @@ def parse(inp) :
     input = inp
     return parser.parse(inp)
 
+def create_native(ast):
+
+    name = "uppercase" # CONVIERTE A MAYUSCULA.
+    params = [{'tipoDato':Tipo.STRING,'identificador':'UpperCase##Native1'}]
+    instrucciones = []
+    uppercase = UpperCase(name, params, instrucciones, -1, -1)
+    ast.addFuncion(uppercase)
+ 
+    name = "lowercase" # CONVIERTE A MINUSCULA.
+    params = [{'tipoDato':Tipo.STRING,'identificador':'LowerCase##Native2'}]
+    instrucciones = []
+    lowercase = LowerCase(name, params, instrucciones, -1, -1)
+    ast.addFuncion(lowercase)
+
+    name = "typeof"
+    params = [{'tipoDato':Tipo.NULO,'identificador':'TypeOf##Native3'}]
+    instrucciones = []
+    typeof = TypeOf(name, params, instrucciones, -1, -1)
+    ast.addFuncion(typeof)    
+
+    name = "length"
+    params = [{'tipoDato':Tipo.STRING,'identificador':'Length##Native4'}]
+    instrucciones = []
+    length = Length(name, params, instrucciones, -1, -1)
+    ast.addFuncion(length)   
+
+    name = "log10"
+    params = [{'tipoDato':Tipo.INT64,'identificador':'Log10##Native5'}]
+    instrucciones = []
+    log10 = Log10(name, params, instrucciones, -1, -1)
+    ast.addFuncion(log10)  
+
+    name = "log"
+    params = [{'tipoDato':Tipo.INT64,'identificador':'Log##Native6'}, {'tipoDato':Tipo.INT64,'identificador':'Log##Native7'}]
+    instrucciones = []
+    log = Log(name, params, instrucciones, -1, -1)
+    ast.addFuncion(log)  
+
+    name = "trunc"
+    params = [{'tipoDato':Tipo.INT64,'identificador':'Trunc##Native8'}]
+    instrucciones = []
+    truncate = Trunc(name, params, instrucciones, -1, -1)
+    ast.addFuncion(truncate)    
+    
+    name = "sin"
+    params = [{'tipoDato':Tipo.INT64,'identificador':'Sin##Native9'}]
+    instrucciones = []
+    sin = Seno(name, params, instrucciones, -1, -1)
+    ast.addFuncion(sin)
+    
+    name = "cos"
+    params = [{'tipoDato':Tipo.INT64,'identificador':'Cos##Native10'}]
+    instrucciones = []
+    cos = Coseno(name, params, instrucciones, -1, -1)
+    ast.addFuncion(cos)
+
+    name = "tan"
+    params = [{'tipoDato':Tipo.INT64,'identificador':'Tan##Native11'}]
+    instrucciones = []
+    tan = Tangente(name, params, instrucciones, -1, -1)
+    ast.addFuncion(tan)
+
+    name = "sqrt"
+    params = [{'tipoDato':Tipo.INT64,'identificador':'Sqrt##Native12'}]
+    instrucciones = []
+    sqrt = Sqrt(name, params, instrucciones, -1, -1)
+    ast.addFuncion(sqrt)
+
+    name = "string"
+    params = [{'tipoDato':Tipo.STRING,'identificador':'String##Native13'}]
+    instrucciones = []
+    string = String(name, params, instrucciones, -1, -1)
+    ast.addFuncion(string)
+
+    name = "parse"
+    params = [{'tipoDato':Tipo.STRING,'identificador':'Parse##Native14'},{'tipoDato':Tipo.STRING,'identificador':'Parse##Native15'}]
+    instrucciones = []
+    parse = Parse(name, params, instrucciones, -1, -1)
+    ast.addFuncion(parse)
+
+    name = "float"
+    params = [{'tipoDato':Tipo.FLOAT64,'identificador':'Float##Native16'}]
+    instrucciones = []
+    float = Float(name, params, instrucciones, -1, -1)
+    ast.addFuncion(float)
+
+
 
 from Interprete.TS.Arbol import Arbol
 from Interprete.TS.TablaSimbolo import TablaSimbolo
@@ -594,7 +724,7 @@ instrucciones = parse(str(entrada)+"\n")
 ast = Arbol(instrucciones)
 TSGlobal = TablaSimbolo()
 ast.set_tabla_ts_global(TSGlobal)
-
+create_native(ast)
 # Busca errores Lexicos y Sintacticos.
 for error in errores:
     ast.get_excepcion().append(error) # Lo guarda
