@@ -1,0 +1,13 @@
+#consola{
+  border:0;
+  background-color: #222222;
+  color: white;
+}
+#btn1 {
+  width: 0; 
+  height: 0; 
+  border-left: 20px solid green;
+  border-top: 20px solid transparent;
+  border-bottom: 20px solid transparent;
+  border-right:20px solid transparent; 
+}

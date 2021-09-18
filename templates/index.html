@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block contend1 %}
+    <style>
+        textarea {resize: none;}
+    </style>
+    {{ codemirror.include_codemirror() }}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-6">
+            <center><h3 class="text-success">Editor</h3></center>
+            
+        </div>
+        <div class="col-md-6">
+            <center><h3 class="text-success">Consola</h3></center>
+        </div>
+    </div>
+    <br/>
+    <div class="row">
+        <div class="col-md-6">
+            <form action="/" method="POST">
+                <input type="submit" class="btn btn-outline-light btn-block" value="Compilar"><br><br>
+                {{ source_form.source_code }}
+            </form>
+        </div>
+        <div class="col-md-6">
+            <br><br>
+            <div class="jumbotron">
+                <textarea id="consola" cols="90" rows="12" wrap='off' spellcheck="false" readonly>{{out}}</textarea>
+            </div>
+        </div>
+    </div>   
+{% endblock %}
+
+{% block content2 %}
+    <br/>
+    <center><h1 class="text-primary">Tabla de Errores</h1></center>
+    <br/>
+
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col">No.</th>
+            <th scope="col">Descripcion</th>
+            <th scope="col">Fila</th>
+            <th scope="col">Columna</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="table-active">
+            <th scope="row">Active</th>
+            <td>Column content</td>
+            <td>Column content</td>
+            <td>Column content</td>
+        </tr>
+        <tr>
+            <th scope="row">Default</th>
+            <td>Column content</td>
+            <td>Column content</td>
+            <td>Column content</td>
+        </tr>
+        <tr class="table-primary">
+            <th scope="row">Primary</th>
+            <td>Column content</td>
+            <td>Column content</td>
+            <td>Column content</td>
+        </tr>
+        <tr class="table-secondary">
+            <th scope="row">Secondary</th>
+            <td>Column content</td>
+            <td>Column content</td>
+            <td>Column content</td>
+        </tr>
+        <tr class="table-success">
+            <th scope="row">Success</th>
+            <td>Column content</td>
+            <td>Column content</td>
+            <td>Column content</td>
+        </tr>
+        <tr class="table-danger">
+            <th scope="row">Danger</th>
+            <td>Column content</td>
+            <td>Column content</td>
+            <td>Column content</td>
+        </tr>
+        <tr class="table-warning">
+            <th scope="row">Warning</th>
+            <td>Column content</td>
+            <td>Column content</td>
+            <td>Column content</td>
+        </tr>
+        <tr class="table-info">
+            <th scope="row">Info</th>
+            <td>Column content</td>
+            <td>Column content</td>
+            <td>Column content</td>
+        </tr>
+        <tr class="table-light">
+            <th scope="row">Light</th>
+            <td>Column content</td>
+            <td>Column content</td>
+            <td>Column content</td>
+        </tr>
+        <tr class="table-dark">
+            <th scope="row">Dark</th>
+            <td>Column content</td>
+            <td>Column content</td>
+            <td>Column content</td>
+        </tr>
+        </tbody>
+    </table>
+  
+{% endblock %}
+
+
+{% block content3 %}
+    <br/>
+    <center><h1 class="text-primary">Tabla de Simbolos</h1></center>
+    <br/>
+
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col">Nombre</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Fila</th>
+            <th scope="col">Columna</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="table-active">
+            <th scope="row">Active</th>
+            <td>Column content</td>
+            <td>Column content</td>
+            <td>Column content</td>
+        </tr>
+        <tr>
+            <th scope="row">Default</th>
+            <td>Column content</td>
+            <td>Column content</td>
+            <td>Column content</td>
+        </tr>
+        <tr class="table-primary">
+            <th scope="row">Primary</th>
+            <td>Column content</td>
+            <td>Column content</td>
+            <td>Column content</td>
+        </tr>
+        <tr class="table-secondary">
+            <th scope="row">Secondary</th>
+            <td>Column content</td>
+            <td>Column content</td>
+            <td>Column content</td>
+        </tr>
+        <tr class="table-success">
+            <th scope="row">Success</th>
+            <td>Column content</td>
+            <td>Column content</td>
+            <td>Column content</td>
+        </tr>
+        <tr class="table-danger">
+            <th scope="row">Danger</th>
+            <td>Column content</td>
+            <td>Column content</td>
+            <td>Column content</td>
+        </tr>
+        <tr class="table-warning">
+            <th scope="row">Warning</th>
+            <td>Column content</td>
+            <td>Column content</td>
+            <td>Column content</td>
+        </tr>
+        <tr class="table-info">
+            <th scope="row">Info</th>
+            <td>Column content</td>
+            <td>Column content</td>
+            <td>Column content</td>
+        </tr>
+        <tr class="table-light">
+            <th scope="row">Light</th>
+            <td>Column content</td>
+            <td>Column content</td>
+            <td>Column content</td>
+        </tr>
+        <tr class="table-dark">
+            <th scope="row">Dark</th>
+            <td>Column content</td>
+            <td>Column content</td>
+            <td>Column content</td>
+        </tr>
+        </tbody>
+    </table>
+    
+    
+{% endblock %}
