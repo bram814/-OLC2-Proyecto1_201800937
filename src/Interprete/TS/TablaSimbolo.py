@@ -32,16 +32,20 @@ class TablaSimbolo:
                 if tablaActual is None:
                     return None
         return None
-        
+    
     #local sin while
     def getLocal(self, id):
+        cont = 1
         tablaActual = self
-        if id in tablaActual.tabla :
-            return tablaActual.tabla[id]
-        else:
-            tablaActual = tablaActual.anterior
-            if tablaActual is None:
-                return None
+        while tablaActual.tabla != None:
+            if id in tablaActual.tabla :
+                return cont
+            else:
+                tablaActual = tablaActual.anterior
+                if tablaActual is None:
+                    return 1
+                cont += 1
+        return 1
 
     def actualizarTabla(self, simbolo):
         tablaActual = self

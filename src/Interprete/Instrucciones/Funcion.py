@@ -18,7 +18,12 @@ class Funcion(Instruccion):
     
     def interpretar(self, tree, table):
         new_table = TablaSimbolo(table) 
-
+        if new_table.getLocal(self.nombre)==1:
+            ambit = "Global"    
+        else:
+            ambit = "Local"
+        dic = {"id":str(self.nombre), "tipo":"function", "ambito":ambit, "fila":self.fila, "columna":self.columna}
+        tree.Table.append(dic)
         for instruccion in self.instrucciones:     
             value = instruccion.interpretar(tree, new_table)
             if isinstance(value, Exception):

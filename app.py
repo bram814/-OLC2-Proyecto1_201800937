@@ -13,7 +13,9 @@ CODEMIRROR_LANGUAGES = ['julia']
 app = Flask(__name__)
 app.config.from_object(__name__)
 codemirror = CodeMirror(app)
-
+analyzer = ""
+data_error = ""
+table_simbol = ""
 class CODEMIRROR_MY_FORM(FlaskForm):
     source_code = CodeMirrorField(
         language = 'julia', 
@@ -30,13 +32,22 @@ def index():
     source_form = CODEMIRROR_MY_FORM()
     out = ""
     text = source_form.source_code.data
-
+    global analyzer
+    global data_error
+    global table_simbol
     if text != None:
-        out = ast.execute_grammar(text)
+        try:
+            analyzer = ast.execute_grammar(text)    # interpreta la entrada.
+            data_error = analyzer.get_excepcion()   # obtiene toda excepcion y lo manda a la tabla de errores.
+            out = analyzer.get_consola()            # obtiene la salida en consola y luego se manda. 
+            table_simbol = analyzer.Table
+        except Exception as e:
+            out = f"WARNING!!! ({e})"
+            data_error = None
+            table_simbol = None
     else:
         out = ""
-        
-    return render_template('index.html',source_form=source_form, out=out)
+    return render_template('index.html', source_form=source_form, out=out, data_error=data_error, table_simbol=table_simbol)
 
 @app.route('/Home')
 def Home():
@@ -48,3 +59,12 @@ def Reporte():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+
+# variable = 1;
+# function abs(abl::Int64)
+#   println(abl);
+# end;
+
+# abs(1000);

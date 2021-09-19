@@ -27,7 +27,13 @@ class Asignacion(Instruccion):
         else: # Si ya Existe el simbolo, lo actualiza en la tabla de simbolos.
             simbolo = Simbolo(str(self.identificador), self.expresion.tipo, self.fila, self.columna, value)
             result = table.actualizarTabla(simbolo)
-        
+           
+        if table.getLocal(str(self.identificador))==1:
+            ambit = "Global"    
+        else:
+            ambit = "Local"
+        dic = {"id":str(self.identificador), "tipo":self.expresion.tipo, "ambito":ambit, "fila":self.fila, "columna":self.columna}
+        tree.Table.append(dic)
         if isinstance(result, Exception): return result
         return None
 

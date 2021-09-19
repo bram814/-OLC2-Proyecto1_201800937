@@ -11,6 +11,7 @@ class Arbol():
         self.excepcion = []
         self.consola = ""
         self.tabla_ts_global = None
+        self.Table = []
 
 
     def get_instruccion(self):

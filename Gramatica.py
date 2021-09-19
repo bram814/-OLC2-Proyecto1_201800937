@@ -753,4 +753,4 @@ def execute_grammar(entrada):
                 ast.update_consola(mistake.__str__())
 
 
-    return ast.get_consola()
+    return ast
