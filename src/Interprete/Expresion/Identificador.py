@@ -1,5 +1,6 @@
 from src.Interprete.Abstract.Instruccion import Instruccion
 from src.Interprete.TS.Exception import Exception
+from src.Interprete.TS.Tipo import Tipo
 
 class Identificador(Instruccion):
     
@@ -15,7 +16,8 @@ class Identificador(Instruccion):
             return Exception("Semantico", "Variable " + self.identificador + " no encontrada.", self.fila, self.columna)
 
         self.tipo = simbolo.get_tipo()
-        if simbolo.get_valor() == None:
+
+        if simbolo.get_valor() == None and simbolo.get_tipo() != Tipo.NULO:
             return Exception("Semantico", "Variable " + self.identificador + " vacia.", self.fila, self.columna)
         
         return simbolo.get_valor()

@@ -506,6 +506,8 @@ def p_tipo(t):
         t[0] = Tipo.CHAR
     elif t[1] == 'String':
         t[0] = Tipo.STRING
+    elif t[1] == 'nothing':
+        t[0] = Tipo.NULO
 # --------------------------------------------- EXPRESION ---------------------------------------------
 
 def p_expresion_binaria(t):
@@ -598,9 +600,9 @@ def p_primitivo_false(t):
     '''expresion : RFALSE'''
     t[0] = Primitivo(Tipo.BOOLEANO, False, t.lineno(1), find_column(input, t.slice[1]))
 
-# def p_primitivo_None(t):
-#     '''expresion : RNOTHING'''
-#     t[0] = Primitivo(Tipo.NULO, None, t.lineno(1), find_column(input, t.slice[1]))
+def p_primitivo_None(t):
+    '''expresion : RNOTHING'''
+    t[0] = Primitivo(Tipo.NULO, None, t.lineno(1), find_column(input, t.slice[1]))
 
 def p_expresion_llamada(t):
     '''expresion : ins_llamada'''
