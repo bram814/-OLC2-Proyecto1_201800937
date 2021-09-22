@@ -60,7 +60,7 @@ def Home():
 def Reporte():
     global report_ast
     try:    
-        init = ast.Node_Ast("ROOT") #
+        init = ast.Node_Ast("ROOT") 
         instr = ast.Node_Ast("INSTRUCCIONES")
         for instruccion in analyzer.get_instruccion():
             instr.crearNodo(instruccion.AST())
