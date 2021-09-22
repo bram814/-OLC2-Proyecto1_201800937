@@ -1,4 +1,5 @@
 from src.Interprete.Abstract.Instruccion import Instruccion
+from src.Interprete.Abstract.Node_Ast import Node_Ast
 from src.Interprete.Instrucciones.Continue import Continue
 from src.Interprete.Instrucciones.Return import Return
 from src.Interprete.Instrucciones.Break import Break
@@ -85,4 +86,19 @@ class For(Instruccion):
         
         
     def AST(self):
-        pass
+        nodo = Node_Ast("FOR")
+        nodo.crearHoja("for")
+        nodo.crearHoja(str(self.variable))
+        nodo.crearHoja("in")
+        nodo.crearNodo(self.cond1.AST())
+        if self.cond2 != None:
+            nodo.crearHoja(":")
+            nodo.crearNodo(self.cond2.AST())
+        instrucciones = Node_Ast("INSTRUCCIONES")
+        for instruccion in self.instrucciones:
+            instrucciones.crearNodo(instruccion.AST())
+        nodo.crearNodo(instrucciones)
+        nodo.crearHoja("end")
+        nodo.crearHoja(";")
+        
+        return nodo

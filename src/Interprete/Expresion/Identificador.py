@@ -1,4 +1,5 @@
 from src.Interprete.Abstract.Instruccion import Instruccion
+from src.Interprete.Abstract.Node_Ast import Node_Ast
 from src.Interprete.TS.Exception import Exception
 from src.Interprete.TS.Tipo import Tipo
 
@@ -24,4 +25,6 @@ class Identificador(Instruccion):
 
 
     def AST(self):
-        pass
+        nodo = Node_Ast("IDENTIFICADOR")
+        nodo.crearHoja(str(self.identificador))
+        return nodo

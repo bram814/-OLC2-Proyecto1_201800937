@@ -1,4 +1,5 @@
 from src.Interprete.Abstract.Instruccion import Instruccion
+from src.Interprete.Abstract.Node_Ast import Node_Ast
 from src.Interprete.TS.Exception import Exception
 
 class Print(Instruccion):
@@ -18,4 +19,17 @@ class Print(Instruccion):
             tree.update_consola_(value)
 
     def AST(self):
-        pass
+        nodo = Node_Ast("PRINT")
+        nodo.crearHoja("print")
+        nodo.crearHoja("(")
+        cont = 0
+        for ins in self.expresion:
+            if cont == 0:
+                nodo.crearNodo(ins.AST())
+                cont = 1
+            else:
+                nodo.crearHoja(",")
+                nodo.crearNodo(ins.AST())
+        nodo.crearHoja(")")
+        nodo.crearHoja(";")
+        return nodo

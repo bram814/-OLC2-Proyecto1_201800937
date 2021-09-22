@@ -1,4 +1,5 @@
 from src.Interprete.Abstract.Instruccion import Instruccion
+from src.Interprete.Abstract.Node_Ast import Node_Ast
 from src.Interprete.Instrucciones.Continue import Continue
 from src.Interprete.Instrucciones.Return import Return
 from src.Interprete.Instrucciones.Break import Break
@@ -36,4 +37,12 @@ class While(Instruccion):
                 return Exception("Semantico", "Tipo de Dato no Booleano en While.", self.fila, self.columna)
 
     def AST(self):
-        pass
+        nodo = Node_Ast("WHILE")
+        nodo.crearHoja("while")
+        nodo.crearNodo(self.condicion.AST())
+        instrucciones = Node_Ast("INSTRUCCIONES")
+        for instr in self.instrucciones:
+            instrucciones.crearNodo(instr.AST())
+        nodo.crearNodo(instrucciones)
+        
+        return nodo

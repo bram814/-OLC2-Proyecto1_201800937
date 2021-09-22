@@ -1,4 +1,5 @@
 from src.Interprete.Abstract.Instruccion import Instruccion
+from src.Interprete.Abstract.Node_Ast import Node_Ast
 from src.Interprete.TS.Exception import Exception
 from src.Interprete.TS.Simbolo import Simbolo
 
@@ -38,4 +39,12 @@ class Declaracion(Instruccion):
         return None
     
     def AST(self):
-        pass
+        nodo = Node_Ast("ASIGNACION")
+
+        nodo.crearHoja(str(self.identificador))
+        
+        nodo.crearNodo(self.expresion.AST())
+        nodo.crearHoja("::")
+        nodo.crearHoja(str(self.expresion.tipo))
+
+        return nodo

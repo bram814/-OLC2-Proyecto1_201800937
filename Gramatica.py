@@ -1,6 +1,7 @@
 from src.Interprete.TS.Exception import Exception
 from src.Interprete.Nativas.UpperCase import UpperCase
 from src.Interprete.Nativas.LowerCase import LowerCase
+from src.Interprete.Abstract.Node_Ast import Node_Ast
 from src.Interprete.Nativas.Tangente import Tangente
 from src.Interprete.Nativas.String import String
 from src.Interprete.Nativas.TypeOf import TypeOf

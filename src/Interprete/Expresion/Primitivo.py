@@ -1,4 +1,5 @@
 from src.Interprete.Abstract.Instruccion import Instruccion
+from src.Interprete.Abstract.Node_Ast import Node_Ast
 
 class Primitivo(Instruccion):
     
@@ -12,4 +13,6 @@ class Primitivo(Instruccion):
         return self.valor
 
     def AST(self):
-        pass
+        nodo = Node_Ast("PRIMITIVO")
+        nodo.crearHoja(str(self.valor))
+        return nodo

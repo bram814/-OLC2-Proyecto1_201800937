@@ -1,4 +1,5 @@
 from src.Interprete.Abstract.Instruccion import Instruccion
+from src.Interprete.Abstract.Node_Ast import Node_Ast
 from src.Interprete.TS.Exception import Exception
 
 class Return(Instruccion):
@@ -21,4 +22,9 @@ class Return(Instruccion):
 
 
     def AST(self):
-        pass
+        nodo = Node_Ast("RETURN")
+        nodo.crearHoja("return")
+        nodo.crearHoja(str(self.result))
+        nodo.crearHoja(";")
+        return nodo
+        

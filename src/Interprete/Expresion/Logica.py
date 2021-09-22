@@ -1,4 +1,5 @@
 from src.Interprete.Abstract.Instruccion import Instruccion
+from src.Interprete.Abstract.Node_Ast import Node_Ast
 from src.Interprete.TS.Exception import Exception
 from src.Interprete.TS.Tipo import *
 
@@ -39,7 +40,17 @@ class Logica(Instruccion):
         return Exception("Semantico", "Tipo de Operacion no Especificado.", self.fila, self.columna)
 
     def AST(self):
-        pass
+        nodo = Node_Ast("LÓGICA")
+        
+        if self.exp_right != None:
+            nodo.crearNodo(self.exp_left.AST())
+            nodo.crearHoja(self.logic())
+            nodo.crearNodo(self.exp_right.AST())
+        else:
+            nodo.crearHoja(self.logic())
+            nodo.crearNodo(self.exp_left.AST())
+        
+        return nodo
 
     def casteo(self,tipo, valor):
         if tipo == Tipo.INT64:
@@ -50,3 +61,11 @@ class Logica(Instruccion):
             return bool(valor)
         return str(valor)
         
+    def logic(self):
+        if self.operador == Operador_Logico.AND:
+            return str("&&")
+        elif self.operador == Operador_Logico.OR:
+            return str("||")
+        elif self.operador == Operador_Logico.NOT:
+            return str("!")
+           

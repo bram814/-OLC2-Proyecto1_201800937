@@ -1,4 +1,5 @@
 from src.Interprete.Abstract.Instruccion import Instruccion
+from src.Interprete.Abstract.Node_Ast import Node_Ast
 
 class Continue(Instruccion):
     def __init__(self, fila, columna):
@@ -9,4 +10,7 @@ class Continue(Instruccion):
         return self
 
     def AST(self):
-        pass
+        nodo = Node_Ast("CONTINUE")
+        nodo.crearHoja("continue")
+        nodo.crearHoja(";")
+        return nodo

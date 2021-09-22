@@ -1,4 +1,5 @@
 from src.Interprete.Expresion.Identificador import Identificador
+from src.Interprete.Abstract.Node_Ast import Node_Ast
 from src.Interprete.Expresion.Primitivo import Primitivo
 from src.Interprete.Abstract.Instruccion import Instruccion
 from src.Interprete.TS.Exception import Exception
@@ -31,13 +32,16 @@ class Llamada(Instruccion):
             contador=0
             for expresion in self.parametros: # SE OBTIENE EL VALOR DEL PARAMETRO EN LA LLAMADA
                 result_expression = expresion.interpretar(tree, table)
-
+                
                 if isinstance(expresion, Primitivo):
-                    dic = {"id":str(expresion.valor), "tipo":f"{expresion.tipo} - Parametro", "ambito":"Local", "fila":expresion.fila, "columna":expresion.columna}
+                    dic = {"id":result.parametros[contador]['identificador'], "tipo":f"{expresion.tipo} - Parametro", "ambito":"Local", "fila":expresion.fila, "columna":expresion.columna}
                 elif isinstance(expresion, Identificador):
-                    dic = {"id":str(expresion.identificador), "tipo":f"{expresion.tipo} - Parametro", "ambito":"Local", "fila":expresion.fila, "columna":expresion.columna}
+                    dic = {"id":result.parametros[contador]['identificador'], "tipo":f"{expresion.tipo} - Parametro", "ambito":"Local", "fila":expresion.fila, "columna":expresion.columna}
                 else:
-                    dic = {"id":str(expresion.id), "tipo":f"{expresion.tipo} - Parametro", "ambito":"Local", "fila":expresion.fila, "columna":expresion.columna}
+                    try:
+                        dic = {"id":result.parametros[contador]['identificador'], "tipo":f"{expresion.tipo} - Parametro", "ambito":"Local", "fila":expresion.fila, "columna":expresion.columna}
+                    except:
+                        dic = {"id":result.parametros[contador]['identificador'], "tipo":f"{expresion.tipo} - Parametro", "ambito":"Local", "fila":expresion.fila, "columna":expresion.columna}
                 tree.Table.append(dic)
             
 
@@ -125,4 +129,12 @@ class Llamada(Instruccion):
 
 
     def AST(self):
-        pass
+        nodo = Node_Ast("LLAMADA A FUNCION")
+        nodo.crearHoja(str(self.nombre))
+        nodo.crearHoja("(")
+        parametros = Node_Ast("PARAMETROS")
+        for param in self.parametros:
+            parametros.crearNodo(param.AST())
+        nodo.crearNodo(parametros)
+        nodo.crearHoja(")")
+        return nodo

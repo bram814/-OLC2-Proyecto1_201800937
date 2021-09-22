@@ -2,7 +2,14 @@
 
 {% block content %}
 
-<br/><br/><br/><br/><br/><br/>
-<center><h1 class="text-info">REPORTE AST</h1></center>
-<br/><br/><br/><br/><br/><br/>
+    <br/><br/><br/>
+    <center><h1 class="text-info">REPORTE AST</h1></center>
+    <br/><br/><br/>
+    <center>
+        <div>
+            {{report_ast|safe}}
+        </div>
+    </center>
+
+    <br/><br/><br/><br/><br/><br/>
 {% endblock %}

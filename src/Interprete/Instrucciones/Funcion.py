@@ -1,4 +1,5 @@
 from src.Interprete.Abstract.Instruccion import Instruccion
+from src.Interprete.Abstract.Node_Ast import Node_Ast
 from src.Interprete.TS.Tipo import Tipo
 from src.Interprete.TS.Exception import Exception
 from src.Interprete.TS.TablaSimbolo import TablaSimbolo
@@ -44,4 +45,26 @@ class Funcion(Instruccion):
         return None
 
     def AST(self):
-        pass
+        
+        nodo = Node_Ast("FUNCION")
+        nodo.crearHoja("function")
+        nodo.crearHoja(str(self.nombre))
+
+        parametros = Node_Ast("PARAMETROS")
+        for param in self.parametros:
+            parametro = Node_Ast("PARAMETRO")
+            parametro.crearHoja(param["identificador"])
+            parametro.crearHoja("::")
+            parametro.crearHoja(param["tipoDato"])
+            parametros.crearNodo(parametro)
+
+        nodo.crearNodo(parametros)
+
+        instrucciones = Node_Ast("INSTRUCCIONES")
+        for instruccion in self.instrucciones:
+            instrucciones.crearNodo(instruccion.AST())
+        nodo.crearNodo(instrucciones)
+
+        nodo.crearHoja("end")
+        nodo.crearHoja(";")        
+        return nodo

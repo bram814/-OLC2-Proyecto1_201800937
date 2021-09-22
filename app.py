@@ -4,6 +4,7 @@ from flask_codemirror import CodeMirror
 from wtforms.fields import SubmitField
 from flask_wtf import FlaskForm
 import Gramatica as ast
+import graphviz
 
 SECRET_KEY = 'secret!'
 CODEMIRROR_THEME = 'material-darker'
@@ -13,9 +14,11 @@ CODEMIRROR_LANGUAGES = ['julia']
 app = Flask(__name__)
 app.config.from_object(__name__)
 codemirror = CodeMirror(app)
+
 analyzer = ""
 data_error = ""
 table_simbol = ""
+report_ast = ""
 class CODEMIRROR_MY_FORM(FlaskForm):
     source_code = CodeMirrorField(
         language = 'julia', 
@@ -55,16 +58,17 @@ def Home():
 
 @app.route('/Reporte')
 def Reporte():
-    return render_template('Reporte.html')
+    global report_ast
+    try:    
+        init = ast.Node_Ast("ROOT")
+        instr = ast.Node_Ast("INSTRUCCIONES")
+        for instruccion in analyzer.get_instruccion():
+            instr.crearNodo(instruccion.AST())
+        init.crearNodo(instr)
+        report_ast = analyzer.GENERATE_AST(init).pipe().decode('utf-8') # SE EJECUTA CON LIBRERIA.
+    except Exception as e:
+        print(f"WARNING!! - {e}")
+    return render_template('Reporte.html', report_ast = report_ast)
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-
-# variable = 1;
-# function abs(abl::Int64)
-#   println(abl);
-# end;
-
-# abs(1000);

@@ -1,4 +1,5 @@
 from src.Interprete.Abstract.Instruccion import Instruccion
+from src.Interprete.Abstract.Node_Ast import Node_Ast
 from src.Interprete.TS.Exception import Exception
 from src.Interprete.TS.Tipo import *
 
@@ -151,7 +152,17 @@ class Aritmetica(Instruccion):
         return Exception("Semantico", "Tipo de Operacion Aritmética no Especificado.", self.fila, self.columna)    
 
     def AST(self):
-        pass
+        nodo = Node_Ast("ARITMÉTICA")
+        if self.exp_rigth != None:
+            nodo.crearNodo(self.exp_left.AST())
+            nodo.crearHoja(self.operator())
+            nodo.crearNodo(self.exp_rigth.AST())
+        else:
+            nodo.crearHoja(self.operator())
+            nodo.crearNodo(self.exp_left.AST())
+
+        return nodo
+        
 
 
     def casteo(self,tipo, valor):
@@ -163,3 +174,19 @@ class Aritmetica(Instruccion):
             return bool(valor)
         return str(valor)
         
+    def operator(self):
+        if self.operador == Operador_Aritmetico.SUMA:
+            return "+"
+        elif self.operador == Operador_Aritmetico.RESTA:
+            return "-"
+        elif self.operador == Operador_Aritmetico.POR:
+            return "*"
+        elif self.operador == Operador_Aritmetico.DIV:
+            return "/"
+        elif self.operador == Operador_Aritmetico.POTE:
+            return "^"
+        elif self.operador == Operador_Aritmetico.MODU:
+            return "&"
+        elif self.operador == Operador_Aritmetico.UMENOS:
+            return "-"
+    

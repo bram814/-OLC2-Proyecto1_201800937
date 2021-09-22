@@ -15,8 +15,8 @@ class TypeOf(Funcion):
     def interpretar(self, tree, table):
         simbolo = table.getTabla("TypeOf##Native3")
         if simbolo == None : return Exception("Semantico", "No se encontró el parámetro de TypeOf", self.fila, self.columna)
-        if simbolo.get_tipo() == Tipo.NULO:
-            return Exception("Semantico", "Tipo de parametro de TypeOf es Nulo.", self.fila, self.columna)
+        # if simbolo.get_tipo() == Tipo.NULO:
+        #     return Exception("Semantico", "Tipo de parametro de TypeOf es Nulo.", self.fila, self.columna)
         
         self.tipo = simbolo.get_tipo()
         if self.tipo == Tipo.NULO:
@@ -31,3 +31,7 @@ class TypeOf(Funcion):
             return "Char"      
         elif self.tipo == Tipo.STRING:
             return "String"
+        elif self.tipo == Tipo.NULO:
+            return "Nulo"
+        else:
+            return str(simbolo.get_tipo())

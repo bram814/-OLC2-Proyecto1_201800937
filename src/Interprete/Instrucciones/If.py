@@ -1,4 +1,5 @@
 from src.Interprete.Abstract.Instruccion import Instruccion
+from src.Interprete.Abstract.Node_Ast import Node_Ast
 from src.Interprete.TS.TablaSimbolo import TablaSimbolo
 from src.Interprete.Instrucciones.Break import Break
 from src.Interprete.Instrucciones.Return import Return 
@@ -55,4 +56,23 @@ class If(Instruccion):
             return Exception("Semantico", "Tipo de Dato no Booleano en If.", self.fila, self.columna)
 
     def AST(self):
-        pass
+        nodo = Node_Ast("IF")
+        nodo.crearHoja("if")
+        nodo.crearNodo(self.condicion.AST())
+        instrucciones_if = Node_Ast("INSTRUCCIONES - IF")
+        for instruccion_if in self.ins_if:
+            instrucciones_if.crearNodo(instruccion_if.AST())
+        nodo.crearNodo(instrucciones_if)
+
+        if self.ins_else != None:
+            instrucciones_else = Node_Ast("INSTRUCCIONES - ELSE")
+            for instruccion_else in self.ins_else:
+                instrucciones_else.crearNodo(instruccion_else.AST())
+            nodo.crearNodo(instrucciones_else)
+
+        elif self.ins_elseif != None:
+            instrucciones_elseif = Node_Ast("INSTRUCCIONES - ELSEIF")
+            instrucciones_elseif.crearNodo(self.ins_elseif.AST())
+            nodo.crearNodo(instrucciones_elseif)
+
+        return nodo

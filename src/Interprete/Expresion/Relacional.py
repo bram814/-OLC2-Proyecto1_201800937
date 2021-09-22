@@ -1,4 +1,5 @@
 from src.Interprete.Abstract.Instruccion import Instruccion
+from src.Interprete.Abstract.Node_Ast import Node_Ast
 from src.Interprete.TS.Exception import Exception
 from src.Interprete.TS.Tipo import *
 
@@ -208,7 +209,13 @@ class Relacional(Instruccion):
         return Exception("Semantico", "Tipo de Operacion no Especificado.", self.fila, self.columna)
 
     def AST(self):
-        pass
+        nodo = Node_Ast("RELACIONAL")
+
+        nodo.crearNodo(self.exp_left.AST())
+        nodo.crearHoja(self.relational())
+        nodo.crearNodo(self.exp_rigth.AST())
+
+        return nodo
 
     def casteo(self,tipo, valor):
         if tipo == Tipo.INT64:
@@ -218,4 +225,18 @@ class Relacional(Instruccion):
         elif tipo == Tipo.BOOLEANO:
             return bool(valor)
         return str(valor)
+        
+    def relational(self):
+        if self.operador == Operador_Relacional.MAYORQUE:
+            return str(">")
+        elif self.operador == Operador_Relacional.MENORQUE:
+            return str("<")
+        elif self.operador == Operador_Relacional.MAYORIGUAL:
+            return str(">=")
+        elif self.operador == Operador_Relacional.MENORIGUAL:
+            return str("<=")
+        elif self.operador == Operador_Relacional.IGUALACION:
+            return str("==")
+        elif self.operador == Operador_Relacional.DIFERENCIA:
+            return str("!=")
         
