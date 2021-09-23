@@ -22,6 +22,8 @@ class Acceso(Instruccion):
                     for i in simbolo.valor.atributos:
                         if i == self.atributo:
                             return simbolo.valor.atributos[i]
+                    
+                    return Exception("Semantico", f"No existe ese atributo {self.atributo}", self.fila, self.columna)
 
     def AST(self):
         pass
