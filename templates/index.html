@@ -10,11 +10,11 @@
 {% block content %}
     <div class="row">
         <div class="col-md-6">
-            <center><h3 class="text-success">Editor</h3></center>
+            <center><h3 class="text-primary">Editor</h3></center>
             
         </div>
         <div class="col-md-6">
-            <center><h3 class="text-success">Consola</h3></center>
+            <center><h3 class="text-primary">Consola</h3></center>
         </div>
     </div>
     <br/>
@@ -50,7 +50,7 @@
         <tbody>
         {% if data_error != None %}
             {% for i in data_error %}
-                <tr class="table table-striped table-dark">
+                <tr class="table table-striped table-active">
                     <th scope="row">{{i.tipo}}</th>
                     <td>{{i.descripcion}}</td>
                     <td>{{i.fila}}</td>
@@ -82,7 +82,7 @@
         <tbody>
             {% if table_simbol != None %}
             {% for i in table_simbol %}
-                <tr class="table table-striped table-dark">
+                <tr class="table table-striped table-active">
                     {% for ins in i %}
                         <td>{{i[ins]}}</td>
                     {% endfor %}

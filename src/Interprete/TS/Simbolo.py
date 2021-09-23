@@ -6,7 +6,7 @@ class Simbolo():
         self.fila = fila
         self.columna = columna
         self.valor = valor
-
+        self.atributos = None
 
     def get_id(self):
         return self.id

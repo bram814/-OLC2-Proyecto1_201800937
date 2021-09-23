@@ -42,6 +42,8 @@ reservadas = {
     'function' : 'RFUNCTION',
     'nothing'  : 'RNOTHING',
     'parse'    : 'RPARSE',
+    'struct'   : 'RSTRUCT',
+    'mutable'  : 'RMUTABLE',
 }
 
 tokens = [
@@ -61,6 +63,7 @@ tokens = [
     'OR',
     'NOT',
     'PUNTOCOMA',
+    'PUNTO',
     'DOSPUNTOS',
     'DOBLEPUNTO',
     'COMA',
@@ -95,6 +98,7 @@ t_AND           = r'\&\&'
 t_OR            = r'\|\|'
 t_NOT           = r'\!'
 t_PUNTOCOMA     = r'\;'
+t_PUNTO         = r'\.'
 t_DOSPUNTOS     = r'\:'
 t_DOBLEPUNTO    = r'\:\:'
 t_COMA          = r'\,'
@@ -195,8 +199,11 @@ precedence = (
 
 # Definición de la Gramatica 
 #   Clases Abstractas.
+from src.Interprete.Instrucciones.Structs.DeclaracionStruct import DeclaracionStruct
 from src.Interprete.Instrucciones.Declaracion import Declaracion
 from src.Interprete.Instrucciones.Asignacion import Asignacion
+from src.Interprete.Instrucciones.Structs.Struct import Struct
+from src.Interprete.Instrucciones.Structs.Acceso import Acceso
 from src.Interprete.Instrucciones.Continue import Continue
 from src.Interprete.Instrucciones.Println import Println
 from src.Interprete.Instrucciones.Llamada import Llamada
@@ -249,6 +256,8 @@ def p_instruccion(t):
                     | ins_for
                     | ins_funcion
                     | ins_llamada fin_instruccion
+                    | ins_struct
+                    | ins_struct_declaracion
                     | COMENTARIO_VARIAS_LINEAS
                     | COMENTARIO_SIMPLE
     '''
@@ -489,6 +498,38 @@ def p_list_param(t):
     'listParam    : expresion'
     t[0] = t[1]
 
+# --------------------------------------------- [STRUCT] [CREAR] ----------------------------------------------
+def p_instruccion_struct(t):
+    '''ins_struct   :   RSTRUCT ID listStructs REND fin_instruccion'''
+    t[0] = Struct(t[2], t[3], t.lineno(1), find_column(input, t.slice[1]))
+
+def p_list_list_struct(t) :
+    'listStructs    : listStructs listStruct'
+    t[1].append(t[2])
+    t[0] = t[1]
+
+def p_list_struct(t) :
+    'listStructs    : listStruct'
+    t[0] = [t[1]]
+
+def p_expresion_struct(t):
+    'listStruct    :    ID PUNTOCOMA'
+    t[0] = {'tipoDato':None,'identificador':t[1], t[1]: None}
+
+def p_expresion_struct_tipo(t):
+    'listStruct    :    ID DOBLEPUNTO TIPO PUNTOCOMA '
+    t[0] = {'tipoDato':t[3],'identificador':t[1], t[1]: None}
+
+# --------------------------------------------- [STRUCT] [DECLARACION] ----------------------------------------------
+def p_instruccion_struct_declaracion(t):
+    '''ins_struct_declaracion   : ID PARA listParams PARC'''
+    t[0] = DeclaracionStruct(t[1], Tipo.STRUCT, t[3], t.lineno(1), find_column(input, t.slice[1]))
+
+# --------------------------------------------- [STRUCT] [CALL] ----------------------------------------------
+def p_instruccion_struct_call(t):
+    '''ins_struct_call  : ID PUNTO ID'''
+    t[0] = Acceso(t[1], t[3], t.lineno(1), find_column(input, t.slice[1]))
+
 # --------------------------------------------- TIPO DE DATO ---------------------------------------------
 def p_tipo(t):
     ''' TIPO            : RINT64
@@ -607,6 +648,10 @@ def p_primitivo_None(t):
 
 def p_expresion_llamada(t):
     '''expresion : ins_llamada'''
+    t[0] = t[1]
+
+def p_expresion_struct_atributo(t):
+    '''expresion : ins_struct_call'''
     t[0] = t[1]
 
 import src.Interprete.ply.yacc as yacc

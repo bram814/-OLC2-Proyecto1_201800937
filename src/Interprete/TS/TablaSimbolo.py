@@ -4,6 +4,7 @@
 
     En la tabla de simbolos nos facilita usar un diccionario para poder ir encontrando las datos.
 
+    ATRIBUTO keys() --> {id:"varaibleId", tipo:"tipoId"} obtiene la posicion id, tipo, etc..
 '''
 
 from src.Interprete.TS.Exception import Exception
@@ -14,6 +15,7 @@ class TablaSimbolo:
         self.tabla = {} # Diccionario Vacio
         self.anterior = anterior
         self.funciones = []
+        self.struct = {}
 
     def setTabla(self, simbolo):      # Agregar una variable
         if simbolo.id in self.tabla :
@@ -63,5 +65,33 @@ class TablaSimbolo:
                     return None
         return Exception("Semantico", "Variable No encontrada en Asignacion", simbolo.get_fila(), simbolo.get_columna())
         
-        
-    
+    def addStruct(self, id, atributos, fila, columna):
+        if id in self.struct.keys():
+            Exception("Semantico", "Variable repetida en Struc.", fila, columna)
+        else:
+            self.struct[id] = atributos
+
+    def getStruct(self, id):
+        tablaActual = self
+        while tablaActual.struct != None:
+            if id in tablaActual.struct.keys():
+                return tablaActual.struct[id]
+            else:
+                tablaActual = tablaActual.anterior
+                if tablaActual is None:
+                    return None
+        return None
+
+    # def actualizarStruct(self, idVar, attrs, type):
+    #     env = self
+    #     newSymbol = Symbol(None, idVar, Type.STRUCT, type)
+    #     newSymbol.attributes = attrs
+    #     while env != None:
+    #         if idVar in env.variables.keys():
+    #             env.variables[idVar] = newSymbol
+    #             return
+    #         env = env.prev
+    #     self.variables[idVar] = newSymbol
+
+    #     tablaActual = self
+    #     simbolo = Simbolo()

@@ -7,7 +7,7 @@ import Gramatica as ast
 import graphviz
 
 SECRET_KEY = 'secret!'
-CODEMIRROR_THEME = 'material-darker'
+CODEMIRROR_THEME = 'liquibyte'
 CODEMIRROR_ADDONS = (('display','autorefresh'),)
 CODEMIRROR_LANGUAGES = ['julia']
 
@@ -39,15 +39,15 @@ def index():
     global data_error
     global table_simbol
     if text != None:
-        try:
-            analyzer = ast.execute_grammar(text)    # interpreta la entrada.
-            data_error = analyzer.get_excepcion()   # obtiene toda excepcion y lo manda a la tabla de errores.
-            out = analyzer.get_consola()            # obtiene la salida en consola y luego se manda. 
-            table_simbol = analyzer.Table
-        except Exception as e:
-            out = f"WARNING!!! ({e})"
-            data_error = None
-            table_simbol = None
+        # try:
+        analyzer = ast.execute_grammar(text)    # interpreta la entrada.
+        data_error = analyzer.get_excepcion()   # obtiene toda excepcion y lo manda a la tabla de errores.
+        out = analyzer.get_consola()            # obtiene la salida en consola y luego se manda. 
+        table_simbol = analyzer.Table
+        # except Exception as e:
+        #     out = f"WARNING!!! ({e})"
+        #     data_error = None
+        #     table_simbol = None
     else:
         out = ""
     return render_template('index.html', source_form=source_form, out=out, data_error=data_error, table_simbol=table_simbol)

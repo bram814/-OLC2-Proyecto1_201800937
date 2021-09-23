@@ -80,8 +80,6 @@ class Arbol():
     # GENERATE AST CON HEROKU
     def GENERATE_AST(self, root):
         dot = graphviz.Digraph(name="grafo", format="svg")
-        print("h")
-        print(root)
         dot.node('n0', root.get_value().replace("\"", "\\\""))
         self.cont = 1
         self.SEARCH_GRAPH(dot, 'n0', root)
